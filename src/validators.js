@@ -24,11 +24,14 @@ module.exports = {
  * @returns {Boolean}
  */
 function alphaValidator(value, rule) {
+  if(!value) {
+    return false;
+  }
+
   const regexStr = rule.allowWhitespace ? "[A-Z\\s_-]" : "[A-Z_-]";
   const regex = createAlphanumericRegexObject(regexStr, rule);
-  const passed = regex.test(value);
 
-  return value ? passed : false;
+  return regex.test(value);
 }
 
 /**
@@ -42,11 +45,14 @@ function alphaValidator(value, rule) {
  * @returns {Boolean}
  */
 function alphanumericValidator(value, rule) {
+  if(!value) {
+    return false;
+  }
+
   const regexStr = rule.allowWhitespace ? "[A-Z0-9\\s_-]" : "[A-Z0-9_-]";
   const regex = createAlphanumericRegexObject(regexStr, rule);
-  const passed = regex.test(value);
 
-  return value ? passed : false;
+  return regex.test(value);
 }
 
 /**
@@ -60,24 +66,61 @@ function alphanumericValidator(value, rule) {
  * @returns {Boolean}
  */
 function asciiTextValidator(value, rule) {
+  if(!value) {
+    return false;
+  }
+
   const regexStr = "[A-Z0-9`~!@#$%^&*()-+=\\[\\]{}\\\\;:'\"|<>?\\,\\.?\\/\\s_-]"; // \\\\ = support for backward slash
   const regex = createAlphanumericRegexObject(regexStr, rule);
-  const passed = regex.test(value);
 
-  return value ? passed : false;
+  return regex.test(value);
 }
 
+
+// Credits: https://github.com/manishsaraan/email-validator/blob/master/index.js
+//
+// Thanks to:
+// http://fightingforalostcause.net/misc/2006/compare-email-regex.php
+// http://thedailywtf.com/Articles/Validating_Email_Addresses.aspx
+// http://stackoverflow.com/questions/201323/what-is-the-best-regular-expression-for-validating-email-addresses/201378#201378
+// https://en.wikipedia.org/wiki/Email_address  The format of an email address is local-part@domain, where the 
+// local part may be up to 64 octets long and the domain may have a maximum of 255 octets.[4]
+//
 /**
  * Validate that a string is an email.
  * @param {String} value (required): The value to validate
  * @returns {Boolean}
  */
 function emailValidator(value) {
-  const regexStr = "^\\S+@\\S+\\.\\S+$";
-  const regex = new RegExp(regexStr);
-  const passed = regex.test(value);
+  const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+  
+  if(!value) {
+    return false;
+  }
 
-  return passed;
+  const emailParts = value.split("@");
+
+  if(emailParts.length !== 2) {
+    return false;
+  }
+
+  const [account, address] = emailParts;
+
+  if(account.length > 64) {
+    return false;
+  }
+
+  if(address.length > 255) {
+    return false;
+  }
+
+  const domainParts = address.split(".");
+  
+  if(domainParts.some(part => part.length > 63)) {
+    return false;
+  }
+
+  return regex.test(value);
 }
 
 /**
@@ -106,15 +149,14 @@ function lengthValidator(value, rule) {
  * @returns {Boolean}
  */
 function numberValidator(value, rule) {
-  const regexStr = rule.allowWhitespace ? "[0-9\\s]" : "[0-9]";
-  const regex = createAlphanumericRegexObject(regexStr, rule);
-  const passed = regex.test(value);
-
   if(value === "" || value === null || value === "undefined") {
     return false;
   }
 
-  return passed;
+  const regexStr = rule.allowWhitespace ? "[0-9\\s]" : "[0-9]";
+  const regex = createAlphanumericRegexObject(regexStr, rule);
+
+  return regex.test(value);
 }
 
 /**
@@ -125,13 +167,10 @@ function numberValidator(value, rule) {
  * @returns {Boolean}
  */
 function regexValidator(value, rule) {
-  let passed;
   const { regex: regexStr } = rule;
-
   const regex = is.object(regexStr) ? regexStr : new RegExp(regexStr);
-  passed = regex.test(value);
 
-  return passed;
+  return regex.test(value);
 }
 
 /**
@@ -143,6 +182,10 @@ function regexValidator(value, rule) {
  * @returns {Boolean}
  */
 function requiredFieldValidator(value, rule, _, extras) {
+  if(value === "" || value === "undefined") {
+    return false;
+  }
+
   let passed;
 
   switch(rule.fieldType) {
@@ -150,10 +193,6 @@ function requiredFieldValidator(value, rule, _, extras) {
   case "text"     :
   case "select"   : 
   case "dropdown" : passed = value.length > 0; break;
-  }
-
-  if(value === "" || value === "undefined") {
-    return false;
   }
 
   return passed;
