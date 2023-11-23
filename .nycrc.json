@@ -1,0 +1,21 @@
+{
+  "check-coverage": true,
+  "include": [
+    "src/**/*.js"
+  ],
+  "exclude": [ 
+    "**/*.test.js",
+    "node_modules/"
+  ],
+  "extension": [
+    ".js"
+  ],
+  "reporter": [ 
+    "text-summary",
+    "json"
+  ],
+  "branches": 0,
+  "lines": 0,
+  "functions": 0,
+  "statements": 0
+}

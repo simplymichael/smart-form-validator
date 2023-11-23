@@ -1,0 +1,44 @@
+{
+  "name": "smart-form-validator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "commit": "git-cz",
+    "lint": "npx eslint src/**/*.js __tests__/**/*.js",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "cross-env NODE_ENV=test mocha __tests__/tests.js",
+    "test:coverage": "nyc npm test"
+  },
+  "keywords": [],
+  "author": "simplymichael <simplymichaelorji@gmail.com> (https://github.com/simplymichael)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simplymichael/smart-form-validator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/simplymichael/smart-form-validator/issues"
+  },
+  "homepage": "https://github.com/simplymichael/smart-form-validator#readme",
+  "devDependencies": {
+    "chai": "4.3.10",
+    "chai-dom": "1.12.0",
+    "commitizen": "4.3.0",
+    "cross-env": "7.0.3",
+    "eslint": "8.53.0",
+    "ghooks": "2.0.4",
+    "jsdom": "22.1.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "10.2.0",
+    "nyc": "15.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    },
+    "ghooks": {
+      "pre-commit": "npm run lint && npm run test:coverage"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+input:not([type="checkbox"]):not([type="submit"]) { padding-right: 35px !important; }
+
+input.sfv.error, input.sfv.error:focus, input.sfv.error:autofill, 
+input.sfv.error:-webkit-autofill, input.sfv.error:-webkit-autofill:focus,
+select.sfv.error, select.sfv.error:focus, 
+textarea.sfv.error, textarea.sfv.error:focus, 
+.sfv.error[contenteditable="true"], .sfv.error[contenteditable="true"]:focus { 
+  border-bottom-color: #f00 !important; 
+}
+
+input.sfv.ok, input.sfv.ok:focus, input.sfv.ok:autofill, input.sfv.ok:autofill:focus,
+input.sfv.ok:-webkit-autofill, input.sfv.ok:-webkit-autofill:focus,
+select.sfv.ok, select.sfv.ok:focus, textarea.sfv.ok, textarea.sfv.ok:focus,
+.sfv.ok[contenteditable="true"], .sfv.ok[contenteditable="true"]:focus {
+  border-bottom-color: #090 !important;
+  background-image: url("./img/check-mark.svg") !important;
+  background-repeat: no-repeat !important;
+  background-position: 95% 50% !important;
+  background-size: 15px !important;
+}
+
+textarea.sfv.ok, textarea.sfv.ok:focus { background-position: 95% 5% !important; }
+
+input[type="checkbox"].sfv.ok, input[type="checkbox"].sfv.ok:focus,
+.sfv.ok[contenteditable="true"], .sfv.ok[contenteditable="true"]:focus { border-color: #090 !important; }
+
