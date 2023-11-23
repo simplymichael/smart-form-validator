@@ -1,48 +1,54 @@
-const { alphanumericValidator: validateAlphanumeric } = require( "../../src/validators");
+const { asciiTextValidator: validateAsciiText } = require( "../../src/validators");
 
-const rule = { type: "alnum" };
+const rule = { type: "text" };
 
 
 module.exports = {
   arguments: ["value", ", rule"],
-  test: alphanumericValidator,
+  test: asciiTextValidator,
 };
 
-function alphanumericValidator(it, expect) {
+function asciiTextValidator(it, expect) {
   it("should fail if value is undefined, null, false, or an empty string", function() {
     const testData = [undefined, null, false, ""];
 
-    testData.forEach(value => expect(validateAlphanumeric(value, rule)).to.equal(false));
+    testData.forEach(value => expect(validateAsciiText(value, rule)).to.equal(false));
   });
 
-  it("should fail if value contains other character except A - Z, 0 - 9 _, or -", function() {
-    expect(validateAlphanumeric("hero_$", rule)).to.equal(false);
-    expect(validateAlphanumeric("J0#n", rule)).to.equal(false);
-    expect(validateAlphanumeric("$%^&*()/\\", rule)).to.equal(false);
+  it("should fail if value contains other character except ASCII characters", function() {
+    const text = "J4n3";
+    const ascii = [
+      "@", "$", "%", "^", "&", "*", "(", ")", "/", "\\", "[", 
+      "]", "{", "}", "'", "\"", "~", "!", "#", "_", "=", "-"
+    ];
+
+    const nonAscii = [
+      "£", "¤", "¢", "¥", "¦", "§", "¨", "©", "¬", "®", 
+      "±", "µ", "¶", "¾", "¿", "Æ", "Ð", "Þ", "ß", "Ø"
+    ];
+
+    expect(validateAsciiText(text, rule)).to.equal(true);
+
+    ascii.forEach(char => expect(validateAsciiText(`${text}_${char}`, rule)).to.equal(true));
+    nonAscii.forEach(char => expect(validateAsciiText(`${text}_${char}`, rule)).to.equal(false));
   });
 
-  it("should fail if value contains whitespace character", function() {
-    expect(validateAlphanumeric("John doe", rule)).to.equal(false);
-    expect(validateAlphanumeric("John doe 53", rule)).to.equal(false);
+  it("should allow whitespace", function() {
+    expect(validateAsciiText("John doe", rule)).to.equal(true);
+    expect(validateAsciiText("John doe 53", rule)).to.equal(true);
   });
 
-  it("should allow whitespace character if `rule.allowWhitespace` is true", function() {
-    const newRule = { ...rule, allowWhitespace: true };
-
-    expect(validateAlphanumeric("John doe", newRule)).to.equal(true);
-    expect(validateAlphanumeric("John doe 53", newRule)).to.equal(true);
-  });
-
-  it("should pass if value contains only A - Z, 0 - 9, _, or -", function() {
-    expect(validateAlphanumeric("John", rule)).to.equal(true);
-    expect(validateAlphanumeric("John1", rule)).to.equal(true);
-    expect(validateAlphanumeric("John_9", rule)).to.equal(true);
-    expect(validateAlphanumeric("John_", rule)).to.equal(true);
-    expect(validateAlphanumeric("_John_", rule)).to.equal(true);
-    expect(validateAlphanumeric("Jo-h-n-", rule)).to.equal(true);
-    expect(validateAlphanumeric("-Jo-h-n", rule)).to.equal(true);
-    expect(validateAlphanumeric("-Jo-h-n-", rule)).to.equal(true);
-    expect(validateAlphanumeric("12-3_456789-0", rule)).to.equal(true);
+  it("should pass if value contains only ASCII characters", function() {
+    expect(validateAsciiText("John", rule)).to.equal(true);
+    expect(validateAsciiText("John1", rule)).to.equal(true);
+    expect(validateAsciiText("John_9", rule)).to.equal(true);
+    expect(validateAsciiText("John_", rule)).to.equal(true);
+    expect(validateAsciiText("_John_", rule)).to.equal(true);
+    expect(validateAsciiText("Jo-h-n-", rule)).to.equal(true);
+    expect(validateAsciiText("-Jo-h-n", rule)).to.equal(true);
+    expect(validateAsciiText("-Jo-h-n-", rule)).to.equal(true);
+    expect(validateAsciiText("12-3_456789-0", rule)).to.equal(true);
+    expect(validateAsciiText("@$%^&*()/\\[]{}'\"~!#_=-", rule)).to.equal(true);
   });
 
   it("should match any arbitrary length string if no length is specified", function() {
@@ -50,40 +56,40 @@ function alphanumericValidator(it, expect) {
     const whitespaceValue = `This Should B3 A String 0f Very Long Length With
       Whitespace That Should Be Validated Against`;
   
-    expect(validateAlphanumeric(noWhitespaceValue, rule)).to.equal(true);
-    expect(validateAlphanumeric(whitespaceValue, { ...rule, allowWhitespace: true })).to.equal(true);
+    expect(validateAsciiText(noWhitespaceValue, rule)).to.equal(true);
+    expect(validateAsciiText(whitespaceValue, rule)).to.equal(true);
   });
 
   it("should fail if value is less than minimum specified length", function() {
     const length = { min: 5 };
     const newRule = { ...rule, length };
 
-    expect(validateAlphanumeric("John", newRule)).to.equal(false);
-    expect(validateAlphanumeric("J0hn", newRule)).to.equal(false);
+    expect(validateAsciiText("John", newRule)).to.equal(false);
+    expect(validateAsciiText("J0hn", newRule)).to.equal(false);
   });
 
   it("should pass if value is at least the minimum specified length", function() {
     const length = { min: 5 };
     const newRule = { ...rule, length };
 
-    expect(validateAlphanumeric("James", newRule)).to.equal(true);
-    expect(validateAlphanumeric("J4m35", newRule)).to.equal(true);
+    expect(validateAsciiText("James", newRule)).to.equal(true);
+    expect(validateAsciiText("J4m35", newRule)).to.equal(true);
   });
 
   it("should fail if value is greater than the maximum specified length", function() {
     const length = { max: 4 };
     const newRule = { ...rule, length };
 
-    expect(validateAlphanumeric("James", newRule)).to.equal(false);
-    expect(validateAlphanumeric("J4m3s", newRule)).to.equal(false);
+    expect(validateAsciiText("James", newRule)).to.equal(false);
+    expect(validateAsciiText("J4m3s", newRule)).to.equal(false);
   });
 
   it("should pass if value is at most the maximum specified length", function() {
     const length = { max: 4 };
     const newRule = { ...rule, length };
 
-    expect(validateAlphanumeric("John", newRule)).to.equal(true);
-    expect(validateAlphanumeric("J04n", newRule)).to.equal(true);
+    expect(validateAsciiText("John", newRule)).to.equal(true);
+    expect(validateAsciiText("J04n", newRule)).to.equal(true);
   });
 
   it("should fail if value is not between minimim and maximum specified length (inclusive)", function() {
@@ -91,7 +97,7 @@ function alphanumericValidator(it, expect) {
     const newRule = { ...rule, length };
     const testData = ["T0m", "Andr3w", "Fr4nc3s"];
 
-    testData.forEach(value => expect(validateAlphanumeric(value, newRule)).to.equal(false));
+    testData.forEach(value => expect(validateAsciiText(value, newRule)).to.equal(false));
   });
 
   it("should pass if value is between minimim and maximum specified length (inclusive)", function() {
@@ -99,7 +105,7 @@ function alphanumericValidator(it, expect) {
     const newRule = { ...rule, length };
     const testData = ["John", "J4m3s", "Fr4nc3s"];
 
-    testData.forEach(value => expect(validateAlphanumeric(value, newRule)).to.equal(true));
+    testData.forEach(value => expect(validateAsciiText(value, newRule)).to.equal(true));
   });
 
   it("should treat a length value of number as the maximum length", function() {
@@ -117,7 +123,7 @@ function alphanumericValidator(it, expect) {
     ];
 
     testData.forEach(({ value, expectation}) => {
-      expect(validateAlphanumeric(value, newRule)).to.equal(expectation);
+      expect(validateAsciiText(value, newRule)).to.equal(expectation);
     });
   });
 
@@ -136,7 +142,7 @@ function alphanumericValidator(it, expect) {
     ];
 
     testData.forEach(({ value, expectation}) => {
-      expect(validateAlphanumeric(value, newRule)).to.equal(expectation);
+      expect(validateAsciiText(value, newRule)).to.equal(expectation);
     });
   });
 }

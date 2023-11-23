@@ -11,11 +11,14 @@
     ".js"
   ],
   "reporter": [ 
-    "text-summary",
-    "json"
+    "clover",
+    "html",
+    "json", 
+    "lcov",
+    "text-summary"
   ],
-  "branches": 0,
-  "lines": 0,
-  "functions": 0,
-  "statements": 0
+  "branches": 40,
+  "lines": 40,
+  "functions": 40,
+  "statements": 40
 }

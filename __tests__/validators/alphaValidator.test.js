@@ -82,7 +82,7 @@ function alphaValidator(it, expect) {
     expect(result).to.equal(true);
   });
 
-  it("should fail if value is not between minimim and maximum specified length (incluse)", function() {
+  it("should fail if value is not between minimim and maximum specified length (inclusive)", function() {
     const length = { min: 4, max: 5 };
     const newRule = { ...rule, length };
     const testData = ["Tom", "Andrew"];
@@ -90,7 +90,7 @@ function alphaValidator(it, expect) {
     testData.forEach(value => expect(validateAlpha(value, newRule)).to.equal(false));
   });
 
-  it("should pass if value is between minimim and maximum specified length (incluse)", function() {
+  it("should pass if value is between minimim and maximum specified length (inclusive)", function() {
     const length = { min: 4, max: 5 };
     const newRule = { ...rule, length };
     const testData = ["John", "James"];
