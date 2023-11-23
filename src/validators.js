@@ -106,11 +106,7 @@ function emailValidator(value) {
 
   const [account, address] = emailParts;
 
-  if(account.length > 64) {
-    return false;
-  }
-
-  if(address.length > 255) {
+  if(account.length > 64 || address.length > 255) {
     return false;
   }
 
