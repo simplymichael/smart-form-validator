@@ -13,6 +13,7 @@ const array = {
 
 const is = {
   array: isArray,
+  number: isNumber,
   object: isObject,
 };
 
@@ -79,6 +80,12 @@ function functionArrayIterator(arr) {
 
 function isArray(data) {
   return Array.isArray(data);
+}
+
+function isNumber(num) {
+  num = Number(num);
+
+  return typeof num === "number" && !Number.isNaN(num);
 }
 
 function isObject(data) {

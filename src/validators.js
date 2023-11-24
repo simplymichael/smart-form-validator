@@ -12,6 +12,26 @@ module.exports = {
   requiredFieldValidator,
 };
 
+/**
+ * Validate that a string contains only alphanumeric characters, _ (underscore), or - (hyphen). 
+ * @param {String} value (required): The string to validate
+ * @param {Object} rule (required): Object containing the length and cases requirement.
+ * @param {Number|Object} [rule.length] (required): The length requirements.
+ * @param {Number} [rule.length.min] (optional): minimum length requirement.
+ * @param {Number} [rule.length.max] (optional): maximum length requirement.
+ * @param {Boolean} [rule.matchCase]: true for case-sensitive validation, false for case-insensitive validation.
+ * @returns {Boolean}
+ */
+function alphanumericValidator(value, rule) {
+  if(!value) {
+    return false;
+  }
+
+  const regexStr = rule.allowWhitespace ? "[A-Z0-9\\s_-]" : "[A-Z0-9_-]";
+  const regex = createAlphanumericRegexObject(regexStr, rule);
+
+  return regex.test(value);
+}
 
 /**
  * Validate that a string contains only the characters A - Z, _ (underscore), or - (hyphen). 
@@ -29,27 +49,6 @@ function alphaValidator(value, rule) {
   }
 
   const regexStr = rule.allowWhitespace ? "[A-Z\\s_-]" : "[A-Z_-]";
-  const regex = createAlphanumericRegexObject(regexStr, rule);
-
-  return regex.test(value);
-}
-
-/**
- * Validate that a string contains only alphanumeric characters, _ (underscore), or - (hyphen). 
- * @param {String} value (required): The string to validate
- * @param {Object} rule (required): Object containing the length and cases requirement.
- * @param {Number|Object} [rule.length] (required): The length requirements.
- * @param {Number} [rule.length.min] (optional): minimum length requirement.
- * @param {Number} [rule.length.max] (optional): maximum length requirement.
- * @param {Boolean} [rule.matchCase]: true for case-sensitive validation, false for case-insensitive validation.
- * @returns {Boolean}
- */
-function alphanumericValidator(value, rule) {
-  if(!value) {
-    return false;
-  }
-
-  const regexStr = rule.allowWhitespace ? "[A-Z0-9\\s_-]" : "[A-Z0-9_-]";
   const regex = createAlphanumericRegexObject(regexStr, rule);
 
   return regex.test(value);
@@ -129,10 +128,14 @@ function emailValidator(value) {
  * @returns {Boolean}
  */
 function lengthValidator(value, rule) {
-  const regex = new RegExp(getLengthRegex(rule.length));
-  const passed = regex.test(value); 
+  if(typeof value === "undefined" || value === null || value === false) {
+    return false;
+  }
 
-  return passed;
+  const regexStr = "[A-Z0-9.\\s_-]";
+  const regex = createAlphanumericRegexObject(regexStr, rule, "*");
+
+  return regex.test(value);
 }
 
 /**
@@ -196,13 +199,13 @@ function requiredFieldValidator(value, rule, _, extras) {
 
 
 // Helpers 
-function createAlphanumericRegexObject(regexStr, rule) {
+function createAlphanumericRegexObject(regexStr, rule, emptyLengthCharacter) {
   let lenRegex;
 
   if(rule.length) {
     lenRegex = getLengthRegex(rule.length);
   } else {
-    lenRegex = "+";
+    lenRegex = emptyLengthCharacter || "+";
   }
 
   regexStr = `${regexStr}${lenRegex}`;
@@ -213,7 +216,7 @@ function createAlphanumericRegexObject(regexStr, rule) {
 
 function getLengthRegex(lengthRule) {
   let regexStr;
-  const len = object.clone(lengthRule);
+  const len = object.clone(lengthRule) || {};
 
   if(len.min && len.max) {
     if(Number(len.min) > Number(len.max)) {
@@ -228,7 +231,7 @@ function getLengthRegex(lengthRule) {
     regexStr = `{${len.min},}`;
   } else if(len.max) {
     regexStr = `{0,${len.max}}`;
-  } else if(typeof Number(len) === "number") {
+  } else if(is.number(len)) {
     regexStr = `{0,${len}}`;
   }
 
