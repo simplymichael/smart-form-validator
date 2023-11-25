@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
 
-const SmartFormValidator = require( "../src/smart-form-validator");
+const { SmartFormValidator } = require( "../src/smart-form-validator");
 const { describe } = require("./setup");
 const { getTestDirectory, getTestFile, getTestFiles, singleFileTest } = require("./test-helpers");
 

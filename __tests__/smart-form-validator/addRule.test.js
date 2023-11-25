@@ -9,7 +9,7 @@ function addRule(it, expect) {
   it("should throw an error if we try to add a rule to a non-existent field", function() {
     const validator = this.test.validator;
     const field = { id: 1 };
-    const rule = {fieldId: field.id, description: "first rule" };
+    const rule = {field: field.id, description: "first rule" };
 
     expect(validator.getFields()).to.be.an("array");
     expect(validator.getFields()).to.have.length(0);
@@ -18,14 +18,16 @@ function addRule(it, expect) {
     // and `expect` will invoke it with the arguments.
     // See: https://stackoverflow.com/a/21587239/1743192
     expect(validator.addRule.bind(validator, rule)).to.throw(
-      errorMessages.fieldNotRegistered.replace(":element:", "validator")
+      errorMessages.fieldNotRegistered
+        .replace(":element:", "validator")
+        .replace(":id:", field.id)
     );
   });
 
   it("should add the rule to the specified field", function() {
     const validator = this.test.validator;
     const field = { id: 1 };
-    const rule = {fieldId: field.id, description: "first rule" };
+    const rule = {field: field.id, description: "first rule" };
 
     expect(validator.getFields()).to.be.an("array");
     expect(validator.getFields()).to.have.length(0);

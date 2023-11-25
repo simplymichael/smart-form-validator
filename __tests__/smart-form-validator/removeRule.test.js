@@ -7,7 +7,7 @@ function removeRule(it, expect) {
   it("should delete the rule on the specified field", function() {
     const validator = this.test.validator;
     const field = { id: 1 };
-    const rule = {fieldId: field.id, description: "first rule updated" };
+    const rule = {field: field.id, description: "first rule updated" };
 
     expect(validator.getFields()).to.be.an("array");
     expect(validator.getFields()).to.have.length(0);

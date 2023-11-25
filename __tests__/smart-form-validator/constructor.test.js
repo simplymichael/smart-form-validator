@@ -1,4 +1,4 @@
-const SmartFormValidator = require( "../../src/smart-form-validator");
+const { SmartFormValidator } = require( "../../src/smart-form-validator");
 
 
 module.exports = {

@@ -148,7 +148,7 @@ function lengthValidator(value, rule) {
  * @returns {Boolean}
  */
 function numberValidator(value, rule) {
-  if(value === "" || value === null || value === "undefined") {
+  if(value === "" || value === null || typeof value === "undefined") {
     return false;
   }
 
@@ -181,7 +181,7 @@ function regexValidator(value, rule) {
  * @returns {Boolean}
  */
 function requiredFieldValidator(value, rule, _, extras) {
-  if(value === "" || value === "undefined") {
+  if(value === "" || typeof value === "undefined") {
     return false;
   }
 

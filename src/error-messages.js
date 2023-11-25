@@ -1,5 +1,5 @@
 module.exports = {
-  fieldNotRegistered: "No field with the specified id has been registered on this :element:",
+  fieldNotRegistered: "No field with the specified id (\":id:\") has been registered on this :element:",
   functionParamExpectsType: "The `:param:` argument expects :type:",
   functionParamIsRequired: "The `:param:` argument is required",
   htmlElementExpected: "The `:param:` argument expects an HTML `:elementType:` element",

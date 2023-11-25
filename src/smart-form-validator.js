@@ -1,13 +1,13 @@
 "use strict";
 
 const errorMessages = require("./error-messages");
-const { is, object, normalizeId, validateId } = require("./helpers");
+const { form, is, object, normalizeId, validateId } = require("./helpers");
 const SmartField = require("./smart-field");
 const SmartForm = require("./smart-form");
 
 
-module.exports = SmartFormValidator;
-exports.smartValidator = new SmartFormValidator();
+module.exports = new SmartFormValidator();
+module.exports.SmartFormValidator = SmartFormValidator;
 
 
 function SmartFormValidator() { 
@@ -118,7 +118,7 @@ SmartFormValidator.prototype.addForm = function addForm(form, rules) {
 /**
  * Add a validation rule to a previuosly created field.
  * @param {Object} rule: object
- * @param {String} [rule.fieldId]: the id of the field to apply the rule to.
+ * @param {String} [rule.field]: the field to apply the rule to. This can be the element itself or its id.
  * @param {Boolean} [rule.required]: specifies whether the field is required (true) or not (false)
  * @param {Number|Object} [rule.length]: specifies the accepted input length. 
  *    If the value is a number, it specifies the maximum length.
@@ -137,19 +137,24 @@ SmartFormValidator.prototype.addRule = function addRule(rule) {
     throw new TypeError(errorMessages.objectExpected.replace(":param:", "rule"));
   }
 
-  if(!object.has(rule, "fieldId")) {
+  if(!object.has(rule, "field")) {
     throw new TypeError(
       errorMessages
         .objectMustHaveProperty
         .replace(":param:", "rule")
-        .replace(":prop:", "fieldId")
+        .replace(":prop:", "field")
     );
   }
 
-  const field = this.getField(rule.fieldId);
+  const fieldId = is.object(rule.field) ? rule.field.id : rule.field;
+  const field = this.getField(fieldId);
 
   if(!field) {
-    throw new TypeError(errorMessages.fieldNotRegistered.replace(":element:", "validator"));
+    throw new TypeError(
+      errorMessages.fieldNotRegistered
+        .replace(":element:", "validator")
+        .replace(":id:", fieldId)
+    );
   }
 
   field.addRule(rule);
@@ -159,13 +164,14 @@ SmartFormValidator.prototype.addRule = function addRule(rule) {
 
 /**
  * 
- * @param {Number|String} fieldId: the id of the field whose rule we want to delete.
+ * @param {Number|String} element: the field whose rule we want to delete. This can be the underlying element or its id.
  * @param {String} key (optional): the key of the rule we want to delete. 
  *    If not specified, the entire rule for the field is deleted.
  *    This means no more validation will take place for that field.
  * @returns this
  */
-SmartFormValidator.prototype.removeRule = function removeRule(fieldId, key) {
+SmartFormValidator.prototype.removeRule = function removeRule(element, key) {
+  const fieldId = is.object(element) ? element.id : element;
   const field = this.getField(fieldId);
 
   if(field) {
@@ -224,8 +230,17 @@ SmartFormValidator.prototype.watch = function validateFormFields(callback) {
 
   fields.forEach(field => {
     const input = field.getElement();
+    let targetEvent;
 
-    input.addEventListener("input", () => {
+    switch(input.type) {
+    case "checkbox" : targetEvent = "click"; break;
+    case "email"    :
+    case "password" : 
+    case "text"     : 
+    default         : targetEvent = "input"; break;
+    }
+
+    input.addEventListener(targetEvent, () => {
       const valid = field.validate();
       validationCallback(field, valid);
       if(typeof callback === "function") {
@@ -245,5 +260,9 @@ SmartFormValidator.prototype.watch = function validateFormFields(callback) {
     if(Object.keys(validatedFields).length === rules.length) {
       allValid = Object.values(validatedFields).every(field => field.valid);
     }
+
+    form.canSubmit(allValid, field.getElement());
   }
 };
+
+

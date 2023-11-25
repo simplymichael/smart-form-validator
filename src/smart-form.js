@@ -1,7 +1,7 @@
 "use strict";
 
 const errorMessages = require("./error-messages");
-const { is, object } = require("./helpers");
+const { form, is, object, validateId } = require("./helpers");
 const SmartField = require("./smart-field");
 
 
@@ -42,6 +42,15 @@ function SmartForm(form, rules) {
 
   this.form = form;
   this.fields = [];
+  const elements = form.elements;
+
+  if(elements) {
+    Array.from(elements).forEach(input => {
+      if(validateId(input.id)) {
+        this.addField(input);
+      }
+    });
+  }
   
   if(is.array(rules)) {
     // Grab a hold of only the input fields passed to our smart-form-validator processor; 
@@ -49,8 +58,12 @@ function SmartForm(form, rules) {
     rules.forEach(rule => {
       const input = form.querySelector(`#${rule.fieldId}`);
 
-      if(input) {
+      /*if(input) {
         this.addField(input, rule);
+      }*/
+
+      if(input && this.getField(input.id)) {
+        this.addRule(rule);
       }
     });
   }
@@ -77,7 +90,7 @@ SmartForm.prototype.addField = function addField(input, rule) {
     throw new TypeError(errorMessages.objectExpected.replace(":param:", "input"));
   }
 
-  if(!object.has(input, "id")) {
+  if(!validateId(input.id)) {
     throw new TypeError(
       errorMessages
         .objectMustHaveProperty
@@ -135,7 +148,7 @@ SmartForm.prototype.addFields = function addFields(fields) {
 /**
  * Add a validation rule to a previuosly created field.
  * @param {Object} rule: object
- * @param {String} [rule.fieldId]: the id of the field to apply the rule to.
+ * @param {String} [rule.field]: the field to apply the rule to. This can be the element itself or its id.
  * @param {Boolean} [rule.required]: specifies whether the field is required (true) or not (false)
  * @param {Number|Object} [rule.length]: specifies the accepted input length. 
  *    If the value is a number, it specifies the maximum length.
@@ -154,19 +167,24 @@ SmartForm.prototype.addRule = function addRule(rule) {
     throw new TypeError(errorMessages.objectExpected.replace(":param:", "rule"));
   }
 
-  if(!object.has(rule, "fieldId")) {
+  if(!object.has(rule, "field")) {
     throw new TypeError(
       errorMessages
         .objectMustHaveProperty
         .replace(":param:", "rule")
-        .replace(":prop:", "fieldId")
+        .replace(":prop:", "field")
     );
   }
 
-  const field = this.getField(rule.fieldId);
+  const fieldId = is.object(rule.field) ? rule.field.id : rule.field;
+  const field = this.getField(fieldId);
 
   if(!field) {
-    throw new TypeError(errorMessages.fieldNotRegistered.replace(":element:", "form"));
+    throw new TypeError(
+      errorMessages.fieldNotRegistered
+        .replace(":element:", "form")
+        .replace(":id:", fieldId)
+    );
   }
 
   field.addRule(rule);
@@ -176,13 +194,14 @@ SmartForm.prototype.addRule = function addRule(rule) {
 
 /**
  * 
- * @param {Number|String} fieldId: the id of the field whose rule we want to delete.
+ * @param {Number|String} element: the field whose rule we want to delete. This can be the element itself or its id.
  * @param {String} key (optional): the key of the rule we want to delete. 
  *    If not specified, the entire rule for the field is deleted.
  *    This means no more validation will take place for that field.
  * @returns this
  */
-SmartForm.prototype.removeRule = function removeRule(fieldId, key) {
+SmartForm.prototype.removeRule = function removeRule(element, key) {
+  const fieldId = is.object(element) ? element.id : element;
   const field = this.getField(fieldId);
 
   if(field) {
@@ -250,8 +269,17 @@ SmartForm.prototype.watch = function validateFormFields(callback) {
 
   fields.forEach(field => {
     const input = field.getElement();
+    let targetEvent;
 
-    input.addEventListener("input", () => {
+    switch(input.type) {
+    case "checkbox" : targetEvent = "click"; break;
+    case "email"    :
+    case "password" : 
+    case "text"     : 
+    default         : targetEvent = "input"; break;
+    }
+
+    input.addEventListener(targetEvent, () => {
       const valid = field.validate();
       validationCallback(field, valid);
       if(typeof callback === "function") {
@@ -271,6 +299,8 @@ SmartForm.prototype.watch = function validateFormFields(callback) {
     if(Object.keys(validatedFields).length === rules.length) {
       formValid = Object.values(validatedFields).every(field => field.valid);
     }
+
+    form.canSubmit(formValid, field.getElement());
   }
 };
 
