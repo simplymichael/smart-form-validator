@@ -2,6 +2,8 @@
 
 const { emailValidator: validateEmail } = require( "../../src/validators");
 
+const rule = { type: "email" };
+
 const validSupported =
 [
   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@letters-in-local.org",
@@ -89,14 +91,14 @@ module.exports = {
 
 function emailValidator(it, expect) {
   it("Should Be Valid", function() {
-    validSupported.forEach(email => expect(validateEmail(email)).to.equal(true));
+    validSupported.forEach(email => expect(validateEmail(email, rule)).to.equal(true));
   });
 
   it("Should Be Invalid", function() {
-    invalidSupported.forEach( email => expect(validateEmail(email)).to.equal(false));
+    invalidSupported.forEach( email => expect(validateEmail(email, rule)).to.equal(false));
   });
 
   it("Should Be Invalid(UnSupported By Module)", function() {
-    validUnsupported.forEach( email => expect(validateEmail(email)).to.equal(false));
+    validUnsupported.forEach( email => expect(validateEmail(email, rule)).to.equal(false));
   });
 }

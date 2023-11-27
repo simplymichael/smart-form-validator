@@ -10,11 +10,17 @@
 /**
  * Validate that a string is an email.
  * @param {String} value (required): The value to validate
+ * @param {Object} rule (required): Object containing the requirements for the value to be valid.
+ * @param {String} [rule.type]: the expected type of the value.
  * @returns {Boolean}
  */
-module.exports = function emailValidator(value) {
+module.exports = function emailValidator(value, rule) {
   const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
-    
+  
+  if(!rule.type || rule.type !== "email") {
+    return true; // if the "email" rule has not been defined for this value, bypass this validator
+  }
+
   if(!value) {
     return false;
   }

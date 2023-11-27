@@ -1,6 +1,6 @@
 const { asciiTextValidator: validateAsciiText } = require( "../../src/validators");
 
-const rule = { type: "text" };
+const rule = { type: "ascii" };
 
 
 module.exports = {

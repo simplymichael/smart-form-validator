@@ -3,7 +3,8 @@ const { createAlphanumericRegexObject } = require("./validator-helpers");
 /**
  * Validate that a string contains only the characters A - Z, _ (underscore), or - (hyphen). 
  * @param {String} value (required): The string to validate
- * @param {Object} rule (required): Object containing the length and cases requirement.
+ * @param {Object} rule (required): Object containing the requirements for the value to be valid.
+ * @param {String} [rule.type]: the expected type of the value.
  * @param {Number|Object} [rule.length] (required): The length requirements.
  * @param {Number} [rule.length.min] (optional): minimum length requirement.
  * @param {Number} [rule.length.max] (optional): maximum length requirement.
@@ -11,6 +12,10 @@ const { createAlphanumericRegexObject } = require("./validator-helpers");
  * @returns {Boolean}
  */
 module.exports = function alphaValidator(value, rule) {
+  if(!rule.type || rule.type !== "alpha") {
+    return true; // if the "alpha" rule has not been defined for this value, bypass this validator
+  }
+
   if(!value) {
     return false;
   }

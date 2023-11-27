@@ -97,8 +97,8 @@ function SmartField(element, rule) {
 
 /**
  * Add a new rule to a SmartField instance or update the existing rule for the instance.
- * @param {Object} rule: object
- * @param {Boolean} [rule.required]
+ * @param {Object} rule: Object containing the requirements for the field's value to be valid.
+ * @param {Boolean} [rule.required]: (for checkbox, dropdown, and text fields): determines if the field is required.
  * @param {Number|Object} [rule.length]: specify the accepted input length. 
  *    If the value is a number, it specifies the maximum length.
  *    If the value is an object, it specifies the minimum and/or maximum length.
@@ -106,7 +106,7 @@ function SmartField(element, rule) {
  * @param {Number} [rule.length.max]: specifies the maximum accepted input length
  * @param {Boolean} [rule.allowWhitespace]: specifies if white-space characters are allowed.
  * @param {Boolean} [rule.matchCase]: performs a case-sensitive (true) or case-insensitive(false) validation.
- * @param {String} [rule.type]: the input field's expected data type (alnum|alpha|email|number|text).
+ * @param {String} [rule.type]: the input field's expected data type (alnum|alpha|ascii|email|number|text).
  *    Default is alnum.
  * @param {String} [rule.regex]: specifies a custom validation regex
  * @param {Boolean} replace (optional): replace the existing rule completely with the new rule.
@@ -303,11 +303,8 @@ SmartField.prototype.getElement = function getElement() {
 SmartField.prototype.getType = function getType() {
   let expectedValueType;
   let input = this.getElement();
-  let valueType = this.getRule("valueType")?.trim();
-
-  if(valueType?.length > 0) {
-    expectedValueType = valueType;
-  } else if(input.type?.toLowerCase() === "checkbox") {
+  
+  if(input.type?.toLowerCase() === "checkbox") {
     expectedValueType = "checkbox";
   } else if(input.tagName.toLowerCase() === "select") {
     expectedValueType = "select";

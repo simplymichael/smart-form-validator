@@ -15,7 +15,7 @@ function validate(it, expect) {
     let result;
     const firstname = "John";
     const firstnameField = $("#firstname-field"); // eslint-disable-line
-    const rule = { required: true };
+    const rule = { type: "text", required: true };
     const sf = new SmartField(firstnameField, rule);
 
     result = sf.validate();

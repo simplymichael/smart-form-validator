@@ -10,7 +10,7 @@ function lengthValidator(it, expect) {
   it("should fail if value is undefined, null, or false", function() {
     const testData = [undefined, null, false];
 
-    testData.forEach(value => expect(validateLength(value, {})).to.equal(false));
+    testData.forEach(value => expect(validateLength(value, {length: 0})).to.equal(false));
   });
 
   it("should match any arbitrary length string if no length is given", function() {
