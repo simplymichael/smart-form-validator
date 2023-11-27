@@ -7,6 +7,9 @@
 // https://en.wikipedia.org/wiki/Email_address  The format of an email address is local-part@domain, where the 
 // local part may be up to 64 octets long and the domain may have a maximum of 255 octets.[4]
 //
+
+const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+
 /**
  * Validate that a string is an email.
  * @param {String} value (required): The value to validate
@@ -15,8 +18,6 @@
  * @returns {Boolean}
  */
 module.exports = function emailValidator(value, rule) {
-  const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
-  
   if(!rule.type || rule.type !== "email") {
     return true; // if the "email" rule has not been defined for this value, bypass this validator
   }
