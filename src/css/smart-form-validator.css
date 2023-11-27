@@ -10,7 +10,7 @@ select.sfv.error, select.sfv.error:focus,
 textarea.sfv.error, textarea.sfv.error:focus, 
 .sfv.error[contenteditable="true"], .sfv.error[contenteditable="true"]:focus { 
   border-bottom-color: #f00 !important; 
-  background-image: url("./img/error.svg") !important;
+  background-image: url("../img/error.svg") !important;
   background-repeat: no-repeat !important;
   background-position: 95% 50% !important;
   background-size: 15px !important;
@@ -25,7 +25,7 @@ input:not([type="submit"]).sfv.ok:-webkit-autofill:focus,
 select.sfv.ok, select.sfv.ok:focus, textarea.sfv.ok, textarea.sfv.ok:focus,
 .sfv.ok[contenteditable="true"], .sfv.ok[contenteditable="true"]:focus {
   border-bottom-color: #090 !important;
-  background-image: url("./img/check-mark.svg") !important;
+  background-image: url("../img/check-mark.svg") !important;
   background-repeat: no-repeat !important;
   background-position: 95% 50% !important;
   background-size: 15px !important;
