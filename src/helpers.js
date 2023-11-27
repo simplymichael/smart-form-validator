@@ -13,6 +13,7 @@ const is = {
   array: isArray,
   number: isNumber,
   object: isObject,
+  string: isString,
 };
 
 const object = {
@@ -45,6 +46,10 @@ function isNumber(num) {
 
 function isObject(data) {
   return (typeof data === "object" && data && !isArray(data));
+}
+
+function isString(data) {
+  return typeof data === "string";
 }
 
 function objectHas(obj, prop) {

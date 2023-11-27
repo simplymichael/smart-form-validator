@@ -10,15 +10,9 @@ const {
   normalizeId,
   validateId,
 } = require("./helpers");
-const {
-  regexValidator,
-  emailValidator,
-  alphaValidator,
-  numberValidator,
-  alphanumericValidator,
-  asciiTextValidator,
-  requiredFieldValidator,
-} = require("./validators");
+const defaultValidators = require("./validators");
+const defaultValidatorEntries = Object.entries(defaultValidators);
+const defaultValidatorKeys = Object.keys(defaultValidators);
 
 
 module.exports = SmartField;
@@ -88,7 +82,9 @@ function SmartField(element, rule) {
 
   this.id = element.id;
   this.element = element;
+  this.defaultValidators = new Map(defaultValidatorEntries);
   this.validators = new Map();
+  this.disabledValidators = [];
 
   if(is.object(rule)) {
     this.addRule({ ...rule, fieldId: element.id });
@@ -166,8 +162,8 @@ SmartField.prototype.getRule = function getRule(key) {
 /**
  * Add a validator to the list of validators for this field.
  * 
- * @param {String} validatorKey 
- * @param {Function} validatorFn: A function that validates the field.
+ * @param {String} validatorKey (required): The identifier for the validator.
+ * @param {Function} validatorFn (required): A function that validates the field.
  *    The function is passed the following arguments in order: 
  *       - `value`: the value entered by the user for this field
  *       - `rule`: the rule defined for this field instance
@@ -175,9 +171,12 @@ SmartField.prototype.getRule = function getRule(key) {
  *       - `extras`: object containing any other field-specific information, 
  *             like the "checked" state for checkboxes, etc.
  *    The function should return Boolean true or false to indicate if the validation passed.
+ * @param {Object} validatorMeta (optional): Object containing validator metadata (namespace, author, etc.)
+ * @param {String} [validatorMeta.namespace]: namespace of the validator. 
+ *    This is appended to the key to prevent naming conflicts.
  * @returns this.
  */
-SmartField.prototype.addValidator = function addValidator(validatorKey, validatorFn) {
+SmartField.prototype.addValidator = function addValidator(validatorKey, validatorFn, validatorMeta) {
   if(typeof validatorKey !== "string") {
     throw new TypeError(
       errorMessages.functionParamExpectsType
@@ -186,19 +185,34 @@ SmartField.prototype.addValidator = function addValidator(validatorKey, validato
     );
   }
 
+  let validatorNamespace = "";
+
   validatorKey = validatorKey.trim();
 
   if(!validatorKey) {
     throw new TypeError(errorMessages.functionParamIsRequired.replace(":param:", "validatorKey"));
   }
 
+  if(is.object(validatorMeta) && is.string(validatorMeta.namespace)) {
+    validatorNamespace = validatorMeta.namespace.trim();
+  }
+
+  validatorKey = generateValidatorKey(validatorKey, validatorNamespace);
+
+  if(defaultValidatorKeys.includes(validatorKey)) {
+    throw new TypeError(
+      errorMessages.argNamesNotAllowed
+        .replace(":argNames:", "keys")
+        .replace(":argTypes:", "validator keys")
+        .replace(":argValues:", defaultValidatorKeys.join("\n"))
+    );
+  }
+
   if(this.hasValidator(validatorKey)) {
     throw new TypeError(
-      errorMessages
-        .objectWithKeyExistsCanReplace
+      errorMessages.objectWithKeyExists
         .replace(":object:", "A validator")
         .replace(":key:", validatorKey)
-        .replace(":replacer:", "replaceValidator(validatorKey, validatorFn)")
     );
   }
 
@@ -215,13 +229,108 @@ SmartField.prototype.addValidator = function addValidator(validatorKey, validato
   return this;
 };
 
-SmartField.prototype.hasValidator = function hasValidator(validatorKey) {
+/**
+ * Disable a validator (including the default validators). 
+ * Disabled validators will not be invoked during the validation process.
+ * 
+ * @param {String} validatorKey (required): The identifier for the validator.
+ * @param {Object} validatorMeta (optional): Object containing validator metadata (namespace, author, etc.)
+ * @param {String} [validatorMeta.namespace]: namespace of the validator. 
+ *    This is appended to the key to prevent naming conflicts.
+ * @returns void
+ */
+SmartField.prototype.disableValidator = function disableValidator(validatorKey, validatorMeta) {
   if(typeof validatorKey === "string") {
     validatorKey = validatorKey.trim();
   }
 
+  let validatorNamespace = "";
+
+  if(is.object(validatorMeta) && is.string(validatorMeta.namespace)) {
+    validatorNamespace = validatorMeta.namespace.trim();
+  }
+
+  validatorKey = generateValidatorKey(validatorKey, validatorNamespace);
+
+  if(!this.hasValidator(validatorKey) && !defaultValidatorKeys.includes(validatorKey)) {
+    throw new TypeError(
+      errorMessages.noObjectWithSpecifiedKey
+        .replace(":object:", "validator")
+        .replace(":key:", validatorKey)
+    );
+  }
+
+  if(this.disabledValidators.includes(validatorKey)) {
+    return true;
+  }
+
+  this.disabledValidators.push(validatorKey);
+
+  return true;
+};
+
+/**
+ * Disable a validator (including the default validators). 
+ * Disabled validators will not be invoked during the validation process.
+ * 
+ * @param {String} validatorKey (required): The identifier for the validator.
+ * @param {Object} validatorMeta (optional): Object containing validator metadata (namespace, author, etc.)
+ * @param {String} [validatorMeta.namespace]: namespace of the validator. 
+ *    This is appended to the key to prevent naming conflicts.
+ * @returns void
+ */
+SmartField.prototype.enableValidator = function enableValidator(validatorKey, validatorMeta) {
+  if(typeof validatorKey === "string") {
+    validatorKey = validatorKey.trim();
+  }
+
+  let validatorNamespace = "";
+
+  if(is.object(validatorMeta) && is.string(validatorMeta.namespace)) {
+    validatorNamespace = validatorMeta.namespace.trim();
+  }
+
+  validatorKey = generateValidatorKey(validatorKey, validatorNamespace);
+
+  if(!this.hasValidator(validatorKey) && !defaultValidatorKeys.includes(validatorKey)) {
+    throw new TypeError(
+      errorMessages.noObjectWithSpecifiedKey
+        .replace(":object:", "validator")
+        .replace(":key:", validatorKey)
+    );
+  }
+  
+  this.disabledValidators = this.disabledValidators.filter(key => key !== validatorKey);
+
+  return true;
+};
+
+/**
+ * @param {String} type (optional): "addon"|"default".
+ * @returns {Object} with members: `default` and/or `addon`.
+ */
+SmartField.prototype.getValidators = function(type) {
+  type = type.toLowerCase().trim();
+
+  const validators = {
+    default: defaultValidatorKeys,
+    addon: this.validators.keys(),
+  };
+
+  if(["addon", "default"].includes(type)) {
+    return validators[type];
+  } else {
+    return validators;
+  }
+};
+
+SmartField.prototype.hasValidator = function hasValidator(validatorKey) {
+  if(typeof validatorKey === "string") {
+    validatorKey = validatorKey.trim().toLowerCase();
+  }
+
   return (
-    typeof validatorKey !== "undefined"
+    typeof validatorKey === "string"
       ? this.validators.has(validatorKey) 
       : this.validators.size > 0
   );
@@ -247,76 +356,11 @@ SmartField.prototype.removeValidator = function removeValidator(validatorKey) {
 };
 
 /**
- * Replace a validator for this field. If the validator does not exist, add it.
- * 
- * @param {String} validatorKey 
- * @param {Function} validatorFn: A function that validates the field.
- *    The function is passed the following arguments in order: 
- *       - `value`: the value entered by the user for this field
- *       - `rule`: the rule defined for this field instance
- *       - `prevResult`: a Boolean value indicating the result of previous validators.
- *       - `extras`: object containing any other field-specific information, 
- *             like the "checked" state for checkboxes, etc.
- *    The function should return Boolean true or false to indicate if the validation passed.
- * @returns this.
- */
-SmartField.prototype.replaceValidator = function replaceValidator(validatorKey, validatorFn) {
-  if(typeof validatorKey !== "string") {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "validatorKey")
-        .replace(":type:", "a string")
-    );
-  }
-
-  validatorKey = validatorKey.trim();
-
-  if(!validatorKey) {
-    throw new TypeError(errorMessages.functionParamIsRequired.replace(":param:", "validatorKey"));
-  }
-
-  if(typeof validatorFn !== "function") {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "validatorFn")
-        .replace(":type:", "a function")
-    );
-  }
-
-  this.validators.set(validatorKey, validatorFn);
-
-  return this;
-};
-
-/**
  * Get the original input field passed to the constructor
  * @returns 
  */
 SmartField.prototype.getElement = function getElement() { 
   return this.element;
-};
-
-/**
- * Get the acceptable input data type for this field
- * @returns {String}
- */
-SmartField.prototype.getType = function getType() {
-  let expectedValueType;
-  let input = this.getElement();
-  
-  if(input.type?.toLowerCase() === "checkbox") {
-    expectedValueType = "checkbox";
-  } else if(input.tagName.toLowerCase() === "select") {
-    expectedValueType = "select";
-  } else if(input.type === "email") {
-    expectedValueType = "email";
-  } else if(typeof input.value !== "undefined") {
-    expectedValueType = "text";
-  } else if(input.isContentEditable && typeof input.textContent !== "undefined") {
-    expectedValueType = "text";
-  }
-
-  return expectedValueType.toLowerCase();
 };
 
 /**
@@ -350,32 +394,25 @@ SmartField.prototype.restore = function() {
  * @returns {Boolean}
  */
 SmartField.prototype.validate = function validate() {
-  registerValidatorsBeforeValidation(this);
+  const disabledValidators = this.disabledValidators;
+  const defaultValidators = getActiveValidators(this.defaultValidators, disabledValidators);
+  const addonValidators = getActiveValidators(this.validators, disabledValidators);
+  const validators = Array.from(defaultValidators.values()).concat(Array.from(addonValidators.values()));
 
-  if(!this.hasValidator()) {
-    throw new TypeError(
-      "There are no validators registered for this field. " +
-      "Please add a rule using the `addRule(rule)` method " +
-      "or a validator using the `addValidator(key, validator)` method"
-    );
+  if(validators.length === 0) {
+    throw new TypeError(errorMessages.noValidatorsActive);
   }
 
   let rule = this.getRule();
+  const input = this.getElement();
   const value = this.getValue();
-  const fieldType = this.getType();
   const extras = {};
 
-  if(rule.required) {
-    rule = object.cloneAndExtend(rule, { fieldType });
-
-    if(fieldType === "checkbox") {
-      const input = this.getElement();
-      extras.checked = input.checked;
-    }
+  if(rule.required && input.type === "checkbox") {
+    extras.checked = input.checked;
   }
 
-  const validatorFns = Array.from(this.validators.values());
-  const validationPassed = validatorFns.reduce((passed, fn) => passed && fn(value, rule, passed, extras), true);
+  const validationPassed = validators.reduce((passed, fn) => passed && fn(value, rule, passed, extras), true);
 
   handleValidationResult(this, validationPassed);
 
@@ -393,6 +430,34 @@ SmartField.prototype.watch = function watch(callback) {
 
 
 // Helpers
+
+function generateValidatorKey(key, namespace) {
+  if(key.length > 0 && namespace.length > 0) {
+    return `${namespace}.${key}`.toLowerCase();
+  } else if(key.length > 0) {
+    return key.toLowerCase();
+  } else {
+    return "";
+  }
+}
+
+/**
+ * 
+ * @param {Object<Map>} validators 
+ * @param {Array<String>} disabledValidators 
+ * @returns {Object<Map>}
+ */
+function getActiveValidators(validators, disabledValidators) {
+  const activeValidators = new Map();  
+
+  for(const [key, value] of validators.entries()) {
+    if(!(disabledValidators.includes(key))) {
+      activeValidators.set(key, value);
+    }
+  }
+
+  return activeValidators;
+}
 
 function getHtmlSelectElementSelectedOption(selectElement) {
   return {
@@ -420,38 +485,6 @@ function markAsValid(field) {
 function markAsInvalid(field) {
   field.classList.remove(VALID_FIELD_CLASSNAME);
   field.classList.add(INVALID_FIELD_CLASSNAME);
-}
-
-function registerValidatorsBeforeValidation(_this) {
-  let rule = _this.getRule();
-  const existingValidators = object.clone(_this.validators);
-
-  _this.removeAllValidators(); // Ensure the in-built validators come first.
-
-  if(rule.regex) {
-    this.replaceValidator("regex", regexValidator);
-  } else {
-    const type = _this.getType();
-
-    if(rule.required) {
-      _this.replaceValidator("required", requiredFieldValidator);
-    }
-
-    switch(type) {
-    case "email"   : _this.replaceValidator(type, emailValidator); break;
-    case "alpha"   : _this.replaceValidator(type, alphaValidator); break;
-    case "number"  : _this.replaceValidator(type, numberValidator); break;
-    case "alnum"   : _this.replaceValidator(type, alphanumericValidator); break;
-    case "text"    : _this.replaceValidator(type, asciiTextValidator); break;  
-    }
-  }
-
-  // Re-register any user-registered custom validators.
-  if(existingValidators.size > 0) {
-    for(const [key, value] of existingValidators.entries()) {
-      _this.addValidator(key, value);
-    }
-  }
 }
 
 function restoreField(input) {
