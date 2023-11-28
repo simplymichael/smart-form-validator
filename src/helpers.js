@@ -1,9 +1,10 @@
 "use strict";
 
 const APP_CLASSNAME = "sfv";
-const DISABLED_FIELD_CLASSNAME = "disabled";
-const VALID_FIELD_CLASSNAME = "ok";
-const INVALID_FIELD_CLASSNAME = "error";
+const SMART_FIELD_CLASSNAME = "sfv-sf";
+const DISABLED_FIELD_CLASSNAME = "sfv-disabled";
+const VALID_FIELD_CLASSNAME = "sfv-ok";
+const INVALID_FIELD_CLASSNAME = "sfv-error";
 
 const form = {
   canSubmit: determineFormSubmission,
@@ -11,6 +12,7 @@ const form = {
 
 const is = {
   array: isArray,
+  function: isFunction,
   number: isNumber,
   object: isObject,
   string: isString,
@@ -30,12 +32,17 @@ module.exports = {
   normalizeId,
   validateId,
   APP_CLASSNAME,
+  SMART_FIELD_CLASSNAME,
   VALID_FIELD_CLASSNAME,
   INVALID_FIELD_CLASSNAME,
 };
 
 function isArray(data) {
   return Array.isArray(data);
+}
+
+function isFunction(data) {
+  return typeof data === "function";
 }
 
 function isNumber(num) {

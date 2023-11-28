@@ -1,6 +1,7 @@
 const SmartField = require( "../../src/smart-field");
 const { 
   APP_CLASSNAME, 
+  SMART_FIELD_CLASSNAME,
   INVALID_FIELD_CLASSNAME, 
   VALID_FIELD_CLASSNAME 
 } = require("../setup");
@@ -23,6 +24,7 @@ function validate(it, expect) {
     expect(result).to.equal(false);
     expect(firstnameField).to.have.text("");
     expect(firstnameField.className).to.contain(APP_CLASSNAME);
+    expect(firstnameField.className).to.contain(SMART_FIELD_CLASSNAME);
     expect(firstnameField.className).not.to.contain(VALID_FIELD_CLASSNAME);
     expect(firstnameField.className).to.contain(INVALID_FIELD_CLASSNAME);
   
@@ -33,6 +35,7 @@ function validate(it, expect) {
     expect(result).to.equal(true);
     expect(firstnameField.value).to.equal(firstname);
     expect(firstnameField.className).to.contain(APP_CLASSNAME);
+    expect(firstnameField.className).to.contain(SMART_FIELD_CLASSNAME);
     expect(firstnameField.className).not.to.contain(INVALID_FIELD_CLASSNAME);
     expect(firstnameField.className).to.contain(VALID_FIELD_CLASSNAME);
   });

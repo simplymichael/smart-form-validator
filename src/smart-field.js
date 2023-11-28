@@ -1,16 +1,19 @@
 "use strict";
 
+const effects = require("./effects");
 const errorMessages = require("./error-messages");
 const { 
-  APP_CLASSNAME, 
-  VALID_FIELD_CLASSNAME, 
-  INVALID_FIELD_CLASSNAME, 
+  APP_CLASSNAME,  
+  SMART_FIELD_CLASSNAME,
   is,
   object,
   normalizeId,
   validateId,
 } = require("./helpers");
 const defaultValidators = require("./validators");
+
+const defaultEffects = Object.values(effects);
+const defaultEffectNames = defaultEffects.map(effect => effect.name);
 const defaultValidatorEntries = Object.entries(defaultValidators);
 const defaultValidatorKeys = Object.keys(defaultValidators);
 
@@ -46,7 +49,11 @@ module.exports = SmartField;
  */
 function SmartField(element, rule) {
   if(!is.object(element)) {
-    throw new TypeError(errorMessages.objectExpected.replace(":param:", "element"));
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "element")
+        .replace(":type:", "object")
+    );
   }
 
   if(!validateId(element.id)) {
@@ -82,13 +89,24 @@ function SmartField(element, rule) {
 
   this.id = element.id;
   this.element = element;
+  this.defaultEffects = new Map();
   this.defaultValidators = new Map(defaultValidatorEntries);
+  this.effects = new Map();
   this.validators = new Map();
+  this.disabledEffects = [];
   this.disabledValidators = [];
+
+  for(const effect of defaultEffects) {
+    const { name, meta, valid, invalid } = effect;
+
+    this.defaultEffects.set(name, { meta, valid, invalid });
+  }
 
   if(is.object(rule)) {
     this.addRule({ ...rule, fieldId: element.id });
   }
+
+  claimField(element);
 }
 
 /**
@@ -160,6 +178,229 @@ SmartField.prototype.getRule = function getRule(key) {
 };
 
 /**
+ * Disable an effect (including the default effects). 
+ * Disabled effects will not be invoked during the validation process.
+ * 
+ * @param {String} effectName (required): The name of the effect.
+ * @param {Object} effectMeta (optional): Object containing effect metadata (namespace, author, version, etc.)
+ * @param {String} [effectMeta.namespace]: namespace of the effect. 
+ *    This is appended to the effect name to prevent naming conflicts.
+ * @returns {Boolean}
+ */
+SmartField.prototype.disableEffect = function disableEffect(effectName, effectMeta) {
+  if(!(is.string(effectName))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effectName")
+        .replace(":type:", "string")
+    );
+  }
+
+  effectName = effectName.trim();
+
+  let effectNamespace = "";
+
+  if(is.object(effectMeta) && is.string(effectMeta.namespace)) {
+    effectNamespace = effectMeta.namespace.trim();
+  }
+
+  effectName = generateEffectName(effectName, effectNamespace);
+
+  if(effectName.length === 0) {
+    throw new TypeError(
+      errorMessages.fieldCannotBeEmpty
+        .replace(":field:", "effectName")
+        .replace(":type:", "string")
+    );
+  }
+
+  if(!(this.isUsingEffect(effectName)) && !(defaultEffectNames.includes(effectName))) {
+    throw new TypeError(
+      errorMessages.noObjectWithSpecifiedKey
+        .replace(":object:", "effect")
+        .replace(":key:", effectName)
+    );
+  }
+
+  if(this.disabledEffects.includes(effectName)) {
+    return true;
+  }
+
+  this.disabledEffects.push(effectName);
+
+  return true;
+};
+
+/**
+ * Re-enable a disabled effect (including the default effects). 
+ * 
+ * @param {String} effectName (required): The name of the effect.
+ * @param {Object} effectMeta (optional): Object containing effect metadata (namespace, author, version, etc.)
+ * @param {String} [effectMeta.namespace]: namespace of the effect. 
+ *    This is appended to the effect name to prevent naming conflicts.
+ * @returns {Boolean}
+ */
+SmartField.prototype.enableEffect = function enableEffect(effectName, effectMeta) {
+  if(!(is.string(effectName))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effectName")
+        .replace(":type:", "string")
+    );
+  }
+
+  effectName = effectName.trim();
+
+  let effectNamespace = "";
+
+  if(is.object(effectMeta) && is.string(effectMeta.namespace)) {
+    effectNamespace = effectMeta.namespace.trim();
+  }
+
+  effectName = generateEffectName(effectName, effectNamespace);
+
+  if(effectName.length === 0) {
+    throw new TypeError(
+      errorMessages.fieldCannotBeEmpty
+        .replace(":field:", "effectName")
+        .replace(":type:", "string")
+    );
+  }
+
+  if(!(this.isUsingEffect(effectName)) && !(defaultEffectNames.includes(effectName))) {
+    throw new TypeError(
+      errorMessages.noObjectWithSpecifiedKey
+        .replace(":object:", "effect")
+        .replace(":key:", effectName)
+    );
+  }
+
+  if(!(this.disabledEffects.includes(effectName))) {
+    return true;
+  }
+
+  this.disabledEffects = this.disabledEffects.filter(name => name !== effectName);
+
+  return true;
+};
+
+/**
+ * @param {String} type (optional): "addon"|"default".
+ * @returns {Object} with members: `default` and/or `addon`.
+ */
+SmartField.prototype.getEffects = function(type) {
+  type = is.string(type) ? type.toLowerCase().trim() : "";
+
+  const effects = {
+    default: defaultEffectNames,
+    addon: this.effects.keys(),
+  };
+
+  if(["addon", "default"].includes(type)) {
+    return effects[type];
+  } else {
+    return effects;
+  }
+};
+
+SmartField.prototype.isUsingEffect = function isUsingEffect(effectName) {
+  if(is.string(effectName)) {
+    effectName = effectName.trim().toLowerCase();
+  }
+
+  return (
+    is.string(effectName)
+      ? this.effects.has(effectName) 
+      : this.effects.size > 0
+  );
+};
+
+/**
+ * 
+ * @param {Object} effect: 
+ * @param {String} [effect.name] (required): The name of this effect, used when registering the effect.
+ * @param {Object} [effect.meta] (optional): Effect meta data, e.g., namespace, author, version, etc.
+ * @param {Function} [effect.valid] (required): Function to invoke post-validation if the field is valid.
+ *    The function receives the validated input field as its first argument.
+ * @param {Function} [effect.invalid] (required): Function to invoke post-validation if the field is invalid.
+ *    The function is passed the validated input field as its first argument
+ * @returns this.
+ */
+SmartField.prototype.useEffect = function useEffect(effect) {
+  if(!(is.object(effect))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect")
+        .replace(":type:", "object")
+    );
+  }
+
+  let { name, meta, valid, invalid } = effect;
+
+  if(!(is.string(name))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.name")
+        .replace(":type:", "string")
+    );
+  }
+
+  let namespace = "";
+  name = name.trim();
+
+  if(!(is.function(valid))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.valid")
+        .replace(":type:", "function")
+    );
+  }
+
+  if(!(is.function(invalid))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.invalid")
+        .replace(":type:", "function")
+    );
+  }
+
+  if(is.object(meta) && is.string(meta.namespace)) {
+    namespace = meta.namespace.trim();
+  }
+
+  const effectName = generateEffectName(name, namespace);
+
+  if(effectName.length === 0) {
+    throw new TypeError(
+      errorMessages.fieldCannotBeEmpty
+        .replace(":field:", "effect.name")
+        .replace(":type:", "string")
+    );
+  }
+
+  if(defaultEffectNames.includes(effectName)) {
+    throw new TypeError(
+      errorMessages.argNamesAreReserved
+        .replace(":argNames:", "names")
+        .replace(":argTypes:", "effect names")
+        .replace(":argValues:", defaultEffectNames.join("\n"))
+    );
+  }
+
+  if(this.isUsingEffect(effectName)) {
+    throw new TypeError(
+      errorMessages.objectWithKeyExists
+        .replace(":object:", "An effect")
+        .replace(":key:", effectName)
+    );
+  }
+
+  this.effects.set(effectName, { meta, valid, invalid });
+
+  return this;
+};
+
+/**
  * Add a validator to the list of validators for this field.
  * 
  * @param {String} validatorKey (required): The identifier for the validator.
@@ -177,7 +418,7 @@ SmartField.prototype.getRule = function getRule(key) {
  * @returns this.
  */
 SmartField.prototype.addValidator = function addValidator(validatorKey, validatorFn, validatorMeta) {
-  if(typeof validatorKey !== "string") {
+  if(!(is.string(validatorKey))) {
     throw new TypeError(
       errorMessages.functionParamExpectsType
         .replace(":param:", "validatorKey")
@@ -201,7 +442,7 @@ SmartField.prototype.addValidator = function addValidator(validatorKey, validato
 
   if(defaultValidatorKeys.includes(validatorKey)) {
     throw new TypeError(
-      errorMessages.argNamesNotAllowed
+      errorMessages.argNamesAreReserved
         .replace(":argNames:", "keys")
         .replace(":argTypes:", "validator keys")
         .replace(":argValues:", defaultValidatorKeys.join("\n"))
@@ -216,7 +457,7 @@ SmartField.prototype.addValidator = function addValidator(validatorKey, validato
     );
   }
 
-  if(typeof validatorFn !== "function") {
+  if(!(is.function(validatorFn))) {
     throw new TypeError(
       errorMessages.functionParamExpectsType
         .replace(":param:", "validatorFn")
@@ -236,11 +477,11 @@ SmartField.prototype.addValidator = function addValidator(validatorKey, validato
  * @param {String} validatorKey (required): The identifier for the validator.
  * @param {Object} validatorMeta (optional): Object containing validator metadata (namespace, author, etc.)
  * @param {String} [validatorMeta.namespace]: namespace of the validator. 
- *    This is appended to the key to prevent naming conflicts.
- * @returns void
+ *    This is appended to the validator key to prevent naming conflicts.
+ * @returns {Boolean}
  */
 SmartField.prototype.disableValidator = function disableValidator(validatorKey, validatorMeta) {
-  if(typeof validatorKey === "string") {
+  if(is.string(validatorKey)) {
     validatorKey = validatorKey.trim();
   }
 
@@ -270,17 +511,17 @@ SmartField.prototype.disableValidator = function disableValidator(validatorKey, 
 };
 
 /**
- * Disable a validator (including the default validators). 
+ * Re-enable a disabled validator (including the default validators). 
  * Disabled validators will not be invoked during the validation process.
  * 
  * @param {String} validatorKey (required): The identifier for the validator.
  * @param {Object} validatorMeta (optional): Object containing validator metadata (namespace, author, etc.)
  * @param {String} [validatorMeta.namespace]: namespace of the validator. 
- *    This is appended to the key to prevent naming conflicts.
- * @returns void
+ *    This is appended to the validator key to prevent naming conflicts.
+ * @returns {Boolean}
  */
 SmartField.prototype.enableValidator = function enableValidator(validatorKey, validatorMeta) {
-  if(typeof validatorKey === "string") {
+  if(is.string(validatorKey)) {
     validatorKey = validatorKey.trim();
   }
 
@@ -310,7 +551,7 @@ SmartField.prototype.enableValidator = function enableValidator(validatorKey, va
  * @returns {Object} with members: `default` and/or `addon`.
  */
 SmartField.prototype.getValidators = function(type) {
-  type = type.toLowerCase().trim();
+  type = is.string(type) ? type.toLowerCase().trim() : "";
 
   const validators = {
     default: defaultValidatorKeys,
@@ -325,12 +566,12 @@ SmartField.prototype.getValidators = function(type) {
 };
 
 SmartField.prototype.hasValidator = function hasValidator(validatorKey) {
-  if(typeof validatorKey === "string") {
+  if(is.string(validatorKey)) {
     validatorKey = validatorKey.trim().toLowerCase();
   }
 
   return (
-    typeof validatorKey === "string"
+    is.string(validatorKey)
       ? this.validators.has(validatorKey) 
       : this.validators.size > 0
   );
@@ -403,6 +644,15 @@ SmartField.prototype.validate = function validate() {
     throw new TypeError(errorMessages.noValidatorsActive);
   }
 
+  const disabledEffects = this.disabledEffects;
+  const defaultEffects = getActiveEffects(this.defaultEffects, disabledEffects);
+  const addonEffects = getActiveEffects(this.effects, disabledEffects);
+  const effects = Array.from(defaultEffects.values()).concat(Array.from(addonEffects.values()));
+
+  if(effects.length === 0) {
+    throw new TypeError(errorMessages.noEffectsActive);
+  }
+
   let rule = this.getRule();
   const input = this.getElement();
   const value = this.getValue();
@@ -414,7 +664,15 @@ SmartField.prototype.validate = function validate() {
 
   const validationPassed = validators.reduce((passed, fn) => passed && fn(value, rule, passed, extras), true);
 
-  handleValidationResult(this, validationPassed);
+  //handleValidationResult(this, validationPassed);
+
+  effects.forEach(({ valid, invalid }) => {
+    if(validationPassed) {
+      valid(input);
+    } else {
+      invalid(input);
+    }
+  });
 
   return validationPassed;
 };
@@ -425,11 +683,32 @@ SmartField.prototype.validate = function validate() {
  *   The function will be passed the input field and the result (Boolean) of the validation.
  */
 SmartField.prototype.watch = function watch(callback) {
-  this.element.addEventListener("input", () => this.validate(_, callback)); // eslint-disable-line
+  const input = this.getElement();
+  let targetEvent;
+  
+  switch(input.type) {
+  case "checkbox" : targetEvent = "click"; break;
+  case "email"    :
+  case "password" : 
+  case "text"     : 
+  default         : targetEvent = "input"; break;
+  }
+  
+  input.addEventListener(targetEvent, () => this.validate(_, callback)); // eslint-disable-line
 };
 
 
 // Helpers
+
+function generateEffectName(name, namespace) {
+  if(name.length > 0 && namespace.length > 0) {
+    return `${namespace}.${name}`.toLowerCase();
+  } else if(name.length > 0) {
+    return name.toLowerCase();
+  } else {
+    return "";
+  }
+}
 
 function generateValidatorKey(key, namespace) {
   if(key.length > 0 && namespace.length > 0) {
@@ -443,9 +722,27 @@ function generateValidatorKey(key, namespace) {
 
 /**
  * 
- * @param {Object<Map>} validators 
+ * @param {Map} effects
+ * @param {Array<String>} disabledEffects
+ * @returns {Map}
+ */
+function getActiveEffects(effects, disabledEffects) {
+  const activeEffects = new Map();  
+
+  for(const [key, value] of effects.entries()) {
+    if(!(disabledEffects.includes(key))) {
+      activeEffects.set(key, value);
+    }
+  }
+
+  return activeEffects;
+}
+
+/**
+ * 
+ * @param {Map} validators 
  * @param {Array<String>} disabledValidators 
- * @returns {Object<Map>}
+ * @returns {Map}
  */
 function getActiveValidators(validators, disabledValidators) {
   const activeValidators = new Map();  
@@ -466,29 +763,12 @@ function getHtmlSelectElementSelectedOption(selectElement) {
   };
 }
 
-function handleValidationResult(field, passed) {
-  const input = field.getElement();
-  input.classList.add(APP_CLASSNAME);
-
-  if(passed) {
-    markAsValid(input);
-  } else {
-    markAsInvalid(input);
-  }
-}
-
-function markAsValid(field) {
-  field.classList.remove(INVALID_FIELD_CLASSNAME);
-  field.classList.add(VALID_FIELD_CLASSNAME);
-}
-
-function markAsInvalid(field) {
-  field.classList.remove(VALID_FIELD_CLASSNAME);
-  field.classList.add(INVALID_FIELD_CLASSNAME);
+function claimField(input) {
+  input.classList?.add(APP_CLASSNAME);
+  input.classList?.add(SMART_FIELD_CLASSNAME);
 }
 
 function restoreField(input) {
-  input.classList.remove(INVALID_FIELD_CLASSNAME);
-  input.classList.remove(VALID_FIELD_CLASSNAME);
-  input.classList.remove(APP_CLASSNAME);
+  input.classList?.remove(SMART_FIELD_CLASSNAME);
+  input.classList?.remove(APP_CLASSNAME);
 }
