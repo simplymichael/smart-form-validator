@@ -6,10 +6,6 @@ const DISABLED_FIELD_CLASSNAME = "sfv-disabled";
 const VALID_FIELD_CLASSNAME = "sfv-ok";
 const INVALID_FIELD_CLASSNAME = "sfv-error";
 
-const form = {
-  canSubmit: determineFormSubmission,
-};
-
 const is = {
   array: isArray,
   function: isFunction,
@@ -26,12 +22,12 @@ const object = {
 
 // eslint-disable-next-line
 module.exports = {
-  form,
   is,
   object,
   normalizeId,
   validateId,
   APP_CLASSNAME,
+  DISABLED_FIELD_CLASSNAME,
   SMART_FIELD_CLASSNAME,
   VALID_FIELD_CLASSNAME,
   INVALID_FIELD_CLASSNAME,
@@ -81,26 +77,4 @@ function normalizeId(id) {
 
 function validateId(id) {
   return ["number", "string"].includes(typeof id) && Boolean(id);
-}
-
-function determineFormSubmission(validationPassed, input) {
-  let submitBtn;
-  const parent = input.parentNode;
-      
-  submitBtn = parent?.querySelector("[type=\"submit\"]");
-  submitBtn = submitBtn || Array.from(parent?.querySelectorAll("button"))?.pop();
-
-  if(!submitBtn) {
-    return;
-  }
-
-  if(validationPassed) {
-    submitBtn.removeAttribute("disabled");
-    submitBtn.classList.remove(APP_CLASSNAME);
-    submitBtn.classList.remove(DISABLED_FIELD_CLASSNAME);
-  } else {
-    submitBtn.setAttribute("disabled", true);
-    submitBtn.classList.add(APP_CLASSNAME);
-    submitBtn.classList.add(DISABLED_FIELD_CLASSNAME);
-  }
 }

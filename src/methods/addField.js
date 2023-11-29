@@ -32,9 +32,7 @@ module.exports = function addField(input, rule) {
     );
   }
   
-  input.id = normalizeId(input.id);
-  
-  const field = this.getField(input.id);
+  const field = this.getField(normalizeId(input.id));
   
   if(field) {
     if(is.object(rule)) {

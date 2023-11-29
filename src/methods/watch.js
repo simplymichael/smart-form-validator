@@ -1,4 +1,4 @@
-const { form } = require("../helpers");
+const errorMessages = require("../error-messages");
 
 
 /**
@@ -15,12 +15,12 @@ module.exports = function validateFormFields(callback) {
   let formValid = false;
   const validatedFields = {};
   const fields = this.getFields();
-  const rules = fields.map(field => Boolean(field.getRule()));
-
-  // Initially disable the submit button
-  form.canSubmit(formValid, fields[0].getElement());
+  const effects = this.getEffects();
+  const inputFields = fields.filter(f => !(isSubmitButton(f)));
+  const submitButton = fields.find(isSubmitButton)?.getElement();
+  const rules = inputFields.map(field => Boolean(field.getRule()));
   
-  fields.forEach(field => {
+  inputFields.forEach(field => {
     const input = field.getElement();
     let targetEvent;
   
@@ -44,6 +44,10 @@ module.exports = function validateFormFields(callback) {
   return {
     valid: () => formValid,
   };
+
+  function isSubmitButton(field) {
+    return field.role === "submit-button";
+  }
   
   function validationCallback(field, valid) {
     validatedFields[field.id] = validatedFields[field.id] || {};
@@ -52,7 +56,24 @@ module.exports = function validateFormFields(callback) {
     if(Object.keys(validatedFields).length === rules.length) {
       formValid = Object.values(validatedFields).every(field => field.valid);
     }
-  
-    form.canSubmit(formValid, field.getElement());
+
+    applyEffects(formValid, effects, submitButton);
   }
 };
+
+// Helpers
+function applyEffects(validationPassed, effects, submitButton) {
+  const effectFns = Array.from(effects.values());
+
+  if(effectFns.length === 0) {
+    throw new TypeError(errorMessages.noEffectsActive);
+  }
+
+  effectFns.forEach(({ valid, invalid }) => {
+    if(validationPassed) {
+      valid(submitButton);
+    } else {
+      invalid(submitButton);
+    }
+  });
+}
