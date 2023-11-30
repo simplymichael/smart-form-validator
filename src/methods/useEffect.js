@@ -1,3 +1,6 @@
+const errorMessages = require("../error-messages");
+const { is, generateEffectName } = require("../helpers");
+
 /**
  * 
  * @param {Object} effect: 
@@ -13,5 +16,30 @@
  * @returns this.
  */
 module.exports = function useEffect(effect) {
-  this.toJSON().forEach(field => field.useEffect(effect));
+  this.effects = this.effects || {};
+
+  if(!(is.object(effect))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect")
+        .replace(":type:", "object")
+    );
+  }
+
+  const { name, meta: { namespace } } = effect;
+  const effectName = generateEffectName(name, namespace);
+
+  if(!(this.effects[effectName])) {
+    this.effects[effectName] = effect;
+  }
+
+  // If this is an instance of SmartForm or SmartFormValidator,
+  // then add the effect to the elements attached to the instance.
+  if(typeof this.toJSON === "function") {
+    this.toJSON().forEach(field => {
+      if(!(field.usesEffect(name, namespace))) {
+        field.useEffect(effect);
+      }
+    });
+  }
 };

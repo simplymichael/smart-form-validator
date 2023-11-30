@@ -5,6 +5,7 @@ const { createAlphanumericRegexObject } = require("./validator-helpers");
  * @param {String} value (required): The string to validate
  * @param {Object} rule (required): Object containing the requirements for the value to be valid.
  * @param {String} [rule.type]: the expected type of the value.
+ * @param {Boolean} [rule.allowWhitespace] (optional): specifies whether to allow whitespace or not.
  * @param {Number|Object} [rule.length] (required): The length requirements.
  * @param {Number} [rule.length.min] (optional): minimum length requirement.
  * @param {Number} [rule.length.max] (optional): maximum length requirement.

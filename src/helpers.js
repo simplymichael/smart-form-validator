@@ -24,6 +24,7 @@ const object = {
 module.exports = {
   is,
   object,
+  generateEffectName,
   normalizeId,
   validateId,
   APP_CLASSNAME,
@@ -68,6 +69,16 @@ function cloneAndExtend(obj, newProps) {
     return Object.assign(clone(obj), newProps);
   } else {
     return obj;
+  }
+}
+
+function generateEffectName(name, namespace) {
+  if(name.length > 0 && namespace.length > 0) {
+    return `${namespace}.${name}`.toLowerCase();
+  } else if(name.length > 0) {
+    return name.toLowerCase();
+  } else {
+    return "";
   }
 }
 

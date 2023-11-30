@@ -86,3 +86,8 @@ SmartForm.prototype.restore = require("./methods/restore");
 SmartForm.prototype.toJSON = require("./methods/toJSON");
 SmartForm.prototype.validate = require("./methods/validate");
 SmartForm.prototype.watch = require("./methods/watch");
+
+
+// Static methods 
+SmartForm.getEffects = require("./methods/getEffects");
+SmartForm.useEffect = require("./methods/useEffect");

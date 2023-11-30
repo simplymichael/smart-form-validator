@@ -7,6 +7,7 @@ const {
   SMART_FIELD_CLASSNAME,
   is,
   object,
+  generateEffectName,
   normalizeId,
   validateId,
 } = require("./helpers");
@@ -25,6 +26,11 @@ module.exports = SmartField;
  * Create a new SmartField object.
  * @param {Object} element: the element to create a SmartField instance from;
  * @param {String} [element.id] (required): the id of the element 
+ * @param {String} [element.role] (optional): the role of the element. 
+ *    This can be particularly usefule for identifying submit buttons that are not defined 
+ *    as `<input type="submit" />`. In such cases, if we want effects that work with submit buttons 
+ *    to have access to the button, we have to give the element a role of "submit-button", e.g. 
+ *    `<button role="submit-button">Submit</button>`.
  * @param {Function} [element.getValue] (optional): A function to get the element value.
  *    The function should return the element's value when called.
  *    If the element is an HTML element such as `input`, `select`, `checkbox`, or a contenteditable field, 
@@ -38,7 +44,7 @@ module.exports = SmartField;
  * @param {Number} [rule.length.min]: specifies the mininum accepted input length
  * @param {Number} [rule.length.max]: specifies the maximum accepted input length
  * @param {Boolean} [rule.matchCase]: performs a case-sensitive (true) or case-insensitive (false) validation.
- * @param {String} [rule.type]: the acceptable data type of the value  for this field (alnum|alpha|email|number|text).
+ * @param {String} [rule.type]: the acceptable data type of the value  for this field (alnum|alpha|ascii|email|number).
  *    Default is alnum.
  * @param {String} [rule.regex]: specifies a custom validation regex.
  * 
@@ -85,7 +91,7 @@ function SmartField(element, rule) {
     );
   }
 
-  if(element.type === "submit") {
+  if(element.type === "submit" || element.role === "submit-button") {
     this.role = "submit-button";
   }
 
@@ -99,7 +105,7 @@ function SmartField(element, rule) {
   for(const effect of defaultEffects) {
     const { name, meta, init, valid, invalid } = effect;
 
-    this.defaultEffects.set(name, { meta, valid, invalid });
+    this.defaultEffects.set(name, { meta, init, valid, invalid });
 
     if(is.function(init)) {
       init(this.element);
@@ -137,7 +143,7 @@ SmartField.prototype.addRule = function addRule(rule) {
   const existingRule = this.rule;
   
   if(is.object(existingRule) && is.object(rule)) {
-    this.rule = object.cloneAndExtend(existingRule, rule); //Object.assign({}, existingRule, rule);
+    this.rule = object.cloneAndExtend(existingRule, rule);
   } else {
     this.rule = rule;
   }
@@ -182,6 +188,26 @@ SmartField.prototype.getRule = function getRule(key) {
 };
 
 /**
+ * getEffect:  retrieves an effect attached to this field by name.
+ * 
+ * @param {String} name (required)
+ * @param {String} namespace (optional)
+ * @returns {Boolean}
+ */
+SmartField.prototype.getEffect = function getEffect(name, namespace) {
+  name = is.string(name) ? name.trim().toLowerCase() : "";
+  namespace = is.string(namespace) ? namespace.trim().toLowerCase() : "";
+
+  const effectName = generateEffectName(name, namespace);
+
+  if(this.effects.has(effectName)) {
+    return this.effects.get(effectName);
+  } else {
+    return null;
+  }
+};
+
+/**
  * @param {String} type (optional): "addon"|"default".
  * @returns {Object} with members: `default` and/or `addon`.
  */
@@ -198,18 +224,6 @@ SmartField.prototype.getEffects = function getActiveEffects(type) {
   } else {
     return effects;
   }
-};
-
-SmartField.prototype.isUsingEffect = function isUsingEffect(effectName) {
-  if(is.string(effectName)) {
-    effectName = effectName.trim().toLowerCase();
-  }
-
-  return (
-    is.string(effectName)
-      ? this.effects.has(effectName) 
-      : this.effects.size > 0
-  );
 };
 
 /**
@@ -287,7 +301,7 @@ SmartField.prototype.useEffect = function useEffect(effect) {
     );
   }
 
-  if(this.isUsingEffect(effectName)) {
+  if(this.usesEffect(effectName)) {
     throw new TypeError(
       errorMessages.objectWithKeyExists
         .replace(":object:", "An effect")
@@ -302,6 +316,28 @@ SmartField.prototype.useEffect = function useEffect(effect) {
   }
 
   return this;
+};
+
+/**
+ * usesEffect: checks whether the field has any effects attached to.
+ * If the `name` (and/or `namespace`) parameter is supplied, 
+ * checks if the field has the named effect attached.
+ * 
+ * @param {String} name (optional)
+ * @param {String} namespace (optional)
+ * @returns {Boolean}
+ */
+SmartField.prototype.usesEffect = function usesEffect(name, namespace) {
+  if(is.string(name)) {
+    name = name.trim().toLowerCase();
+    namespace = is.string(namespace) ? namespace.trim().toLowerCase() : "";
+
+    const effectName = generateEffectName(name, namespace);
+
+    return this.effects.has(effectName);
+  } else {
+    return this.effects.size > 0;
+  }
 };
 
 /**
@@ -502,16 +538,6 @@ SmartField.prototype.watch = function watch(callback) {
 
 
 // Helpers
-
-function generateEffectName(name, namespace) {
-  if(name.length > 0 && namespace.length > 0) {
-    return `${namespace}.${name}`.toLowerCase();
-  } else if(name.length > 0) {
-    return name.toLowerCase();
-  } else {
-    return "";
-  }
-}
 
 function generateValidatorKey(key, namespace) {
   if(key.length > 0 && namespace.length > 0) {

@@ -177,8 +177,22 @@ An effect object may also contain the following optional properties:
   to create a unique name for the effect.
 
 #### Registering effects 
-After creating an effect, you must register it with the `useEffect(effect)` method.
-`useEffect` expects the full effect object as an argument.
+After creating an effect, you must register it. An effect can be registered "globally" or "locally".
+
+Registering an effect "globally" makes the effect available to all instances of `SmartFormValidator`.
+Just call `useEffect(effect)` statically on the `SmartFormValidator` class like so: 
+`SmartFormValidator.useEffect(effect)`.
+ 
+Registering an effect "locally" means the effect is only available to fields within the 
+current `SmartFormValidator` instance. To do a "local" effect registration, 
+call the `useEffect(effect)` method on the instance like so: 
+```js
+const instance = new SmartFormValidator();
+
+instance.useEffect(effect);
+```
+
+In both cases, `useEffect` expects the complete effect object as its argument.
   
 ## Testing
 - Run all tests: `npm test`.

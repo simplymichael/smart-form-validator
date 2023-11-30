@@ -52,3 +52,8 @@ SmartFormValidator.prototype.validate = require("./methods/validate");
 SmartFormValidator.prototype.watch = require("./methods/watch");
 
 
+// Static methods 
+SmartFormValidator.getEffects = require("./methods/getEffects");
+SmartFormValidator.useEffect = require("./methods/useEffect");
+
+
