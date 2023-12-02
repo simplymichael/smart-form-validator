@@ -1,11 +1,12 @@
 # Smart Form Validator
-Declarative HTML form fields validation.
+A somewhat declarative approach to HTML form fields validation.
 
 
 The idea behind Smart Form Validation is simple. 
-A form has fields; and each field has constraints that specify what type of data it expects.
-When a user enters some value into a field, our code checks to ensure the value they entered corresponds
-to the expected format for that field. 
+A form has fields; Each field has conditions and constraints that values entered into it must 
+satisfy to be considered valid.
+When a field receives input from a user, our code checks to ensure the input value satisfies
+the expected format for that field. 
 Based on the result of that check, a visual cue is shown to the user to let them know instantly
 whether or not they have correctly or incorrectly filled the field before they even attempt to submit the form 
 for processing. In some cases, we may even limit their ability to submit the form if 
@@ -101,11 +102,11 @@ new SmartformValidator()
 
 ### Validators
 Validators are rule enforcers. 
-A validators is a function that checks the value entered into a field 
-and ensures that it complies with the constraints specified on the field. 
+A validator is a function that checks that the value entered into a field 
+complies with the constraints placed on that field. 
 
-### Built-in validators
-The following are the built-in validators corresponding with the built-in rules: 
+### Default validators
+The following validators come built-in corresponding with the built-in rules: 
 - `alphaValidator`: checks that a field contains only the letters `A - Z`, underscores (`_`), and dashes (`-`).
   The field can also accept whitespace characters with the `allowWhitespace` rule set to true.
   To perform a case-insensitive check, set the `matchCase` rule to `false`.
@@ -114,9 +115,8 @@ The following are the built-in validators corresponding with the built-in rules:
   The field can also accept whitespace characters with the `allowWhitespace` rule set to true.
   To perform a case-insensitive check, set the `matchCase` rule to `false`.
 - `asciiTextValidator`: checks that a field contains only characters from the ASCII character-set. 
-  This validator accepts whitespace characters by default irrespective of the value of the 
-  `allowWhitespace` rule. However, you can specify a case-insensitive match by setting the 
-  `matchCase` rule to `false`.
+  This validator accepts whitespace characters by default irrespective of the value of the `allowWhitespace` rule. 
+  However, you can specify a case-insensitive match by setting the `matchCase` rule to `false`.
 - `emailValidator`: checks that the value entered into the field has a valid email form.
 - `lengthValidator`: checks that the value entered in the field is between the minimum 
   and/or maximum specified length.
@@ -166,6 +166,7 @@ After creating a validator, you must register it with the `addValidator(name, va
 2. A validator should return only `true` or `false` values. 
    A validator should not carry out any action directly on the field in the event of a 
    successful or failed validation. Any such effects should be delegated to [effects](#effects).
+   In the end, the validation process is reduced to a binary passing or failing test.
 
 
 ### Effects
