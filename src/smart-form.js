@@ -1,7 +1,7 @@
 "use strict";
 
 const errorMessages = require("./error-messages");
-const { is, validateId } = require("./helpers");
+const { is, isSubmitBtn, validateId } = require("./helpers");
 
 
 module.exports = SmartForm;
@@ -9,7 +9,8 @@ module.exports = SmartForm;
 
 /**
  * Create a new SmartForm object.
- * @param {Object} the HTML form element to add validation routine to.
+ * @param {Object|String} the form element to add validation routine to.
+ *    This can be the HTML form object if we already have it, or its ID.
  * @param {Array} rules (optional): array of objects specifying the validation rules for the form's elements.
  * @param {String} [rules[i].fieldId]: the id of the input field to apply these rules to
  * @param {Boolean} [rules[i].required]: specifies whether the field is required (true) or not (false)
@@ -30,6 +31,10 @@ module.exports = SmartForm;
  * either during initialization or by calling the addRule(rule) method on the SmartForm instance.
  */
 function SmartForm(form, rules) {
+  if(typeof form === "string") {
+    form = document.getElementById(form.trim());
+  }
+
   if(!is.object(form)) {
     throw new TypeError(
       errorMessages
@@ -45,7 +50,7 @@ function SmartForm(form, rules) {
 
   if(elements) {
     Array.from(elements).forEach(input => {
-      if(validateId(input.id)) {
+      if(validateId(input.id) || isSubmitBtn(input)) {
         this.addField(input);
       }
     });
@@ -57,10 +62,6 @@ function SmartForm(form, rules) {
     rules.forEach(rule => {
       const input = form.querySelector(`#${rule.fieldId}`);
 
-      /*if(input) {
-        this.addField(input, rule);
-      }*/
-
       if(input && this.getField(input.id)) {
         this.addRule(rule);
       }
@@ -68,12 +69,14 @@ function SmartForm(form, rules) {
   }
 }
 
-SmartForm.prototype.addField = require("./methods/addField");
-SmartForm.prototype.addFields = function addFields(fields) {
+SmartForm.prototype.addField = function addField(element, rule) {
   const formInputIds = Array.from(this.form.elements).map(el => el.id);
-  const formInputFields = fields.filter(field => formInputIds.includes(field.id));
 
-  return require("./methods/addFields").call(this, formInputFields);
+  if(formInputIds.includes(element.id)) {
+    require("./methods/addField").call(this, element, rule);
+  }
+
+  return this;
 };
 
 SmartForm.prototype.addRule = require("./methods/addRule");
@@ -82,7 +85,6 @@ SmartForm.prototype.getField = require("./methods/getField");
 SmartForm.prototype.getFields = require("./methods/getFields");
 SmartForm.prototype.getEffects = require("./methods/getEffects");
 SmartForm.prototype.useEffect = require("./methods/useEffect");
-SmartForm.prototype.restore = require("./methods/restore");
 SmartForm.prototype.toJSON = require("./methods/toJSON");
 SmartForm.prototype.validate = require("./methods/validate");
 SmartForm.prototype.watch = require("./methods/watch");

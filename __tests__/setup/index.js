@@ -20,7 +20,7 @@ jsdomGlobal();
 
 
 beforeEach((done) => {
-  JSDOM.fromFile("__tests__/html/field.html")
+  JSDOM.fromFile("__tests__/html/index.html")
     .then((dom) => {
       global.document = dom.window.document;
       global.$ = global.document.querySelector.bind(global.document);

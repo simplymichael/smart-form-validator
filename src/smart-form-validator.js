@@ -46,7 +46,6 @@ SmartFormValidator.prototype.getField = require("./methods/getField");
 SmartFormValidator.prototype.getFields = require("./methods/getFields");
 SmartFormValidator.prototype.getEffects = require("./methods/getEffects");
 SmartFormValidator.prototype.useEffect = require("./methods/useEffect");
-SmartFormValidator.prototype.restore = require("./methods/restore");
 SmartFormValidator.prototype.toJSON = require("./methods/toJSON");
 SmartFormValidator.prototype.validate = require("./methods/validate");
 SmartFormValidator.prototype.watch = require("./methods/watch");

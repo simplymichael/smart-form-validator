@@ -25,6 +25,7 @@ module.exports = {
   is,
   object,
   generateEffectName,
+  isSubmitBtn,
   normalizeId,
   validateId,
   APP_CLASSNAME,
@@ -80,6 +81,10 @@ function generateEffectName(name, namespace) {
   } else {
     return "";
   }
+}
+
+function isSubmitBtn(element) {
+  return element.type === "submit" || element.role === "submit-button";
 }
 
 function normalizeId(id) {

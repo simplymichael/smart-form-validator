@@ -1,5 +1,5 @@
 const errorMessages = require("../error-messages");
-const { is, normalizeId, validateId } = require("../helpers");
+const { is, isSubmitBtn, normalizeId, validateId } = require("../helpers");
 const SmartField = require("../smart-field");
 
 /**
@@ -26,10 +26,14 @@ const SmartField = require("../smart-field");
  */
 module.exports = function addField(input, rule) {
   if(!is.object(input)) {
-    throw new TypeError(errorMessages.objectExpected.replace(":param:", "input"));
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "input")
+        .replace(":type:", "object")
+    );
   }
   
-  if(!validateId(input.id)) {
+  if(!validateId(input.id) && !isSubmitBtn(input)) {
     throw new TypeError(
       errorMessages.objectPropertyShouldHaveType
         .replace(":prop:", "id")

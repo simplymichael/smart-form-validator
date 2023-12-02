@@ -8,6 +8,7 @@ const {
   is,
   object,
   generateEffectName,
+  isSubmitBtn,
   normalizeId,
   validateId,
 } = require("./helpers");
@@ -62,7 +63,7 @@ function SmartField(element, rule) {
     );
   }
 
-  if(!validateId(element.id)) {
+  if(!validateId(element.id) && !isSubmitBtn(element)) {
     throw new TypeError(
       errorMessages
         .objectPropertyShouldHaveType
@@ -72,7 +73,7 @@ function SmartField(element, rule) {
     );
   }
 
-  if(normalizeId(element.id).length === 0) {
+  if(normalizeId(element.id).length === 0 && !isSubmitBtn(element)) {
     throw new TypeError(
       errorMessages
         .objectPropertyCannotBeEmpty
@@ -91,7 +92,7 @@ function SmartField(element, rule) {
     );
   }
 
-  if(element.type === "submit" || element.role === "submit-button") {
+  if(isSubmitBtn(element)) {
     this.role = "submit-button";
   }
 
@@ -472,10 +473,6 @@ SmartField.prototype.getValue = function getValue() {
   return value;
 };
 
-SmartField.prototype.restore = function() {
-  restoreField(this.getElement());
-};
-
 /**
  * @returns {Boolean}
  */
@@ -559,9 +556,4 @@ function getHtmlSelectElementSelectedOption(selectElement) {
 function claimField(input) {
   input.classList?.add(APP_CLASSNAME);
   input.classList?.add(SMART_FIELD_CLASSNAME);
-}
-
-function restoreField(input) {
-  input.classList?.remove(SMART_FIELD_CLASSNAME);
-  input.classList?.remove(APP_CLASSNAME);
 }

@@ -5,7 +5,7 @@ const { is, object } = require("../helpers");
 /**
  * Add a validation rule to a previuosly created field.
  * @param {Object} rule: object
- * @param {String} [rule.field]: the field to apply the rule to. This can be the element itself or its id.
+ * @param {Object|String} [rule.field]: the field to apply the rule to. This can be the element itself or its id.
  * @param {Boolean} [rule.required]: specifies whether the field is required (true) or not (false)
  * @param {Number|Object} [rule.length]: specifies the accepted input length. 
  *    If the value is a number, it specifies the maximum length.
@@ -21,13 +21,16 @@ const { is, object } = require("../helpers");
  */
 module.exports = function addRule(rule) {
   if(!is.object(rule)) {
-    throw new TypeError(errorMessages.objectExpected.replace(":param:", "rule"));
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "rule")
+        .replace(":type:", "object")
+    );
   }
   
   if(!object.has(rule, "field")) {
     throw new TypeError(
-      errorMessages
-        .objectMustHaveProperty
+      errorMessages.objectMustHaveProperty
         .replace(":param:", "rule")
         .replace(":prop:", "field")
     );
