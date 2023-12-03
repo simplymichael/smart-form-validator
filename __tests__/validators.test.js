@@ -6,7 +6,7 @@ const testDirectory = getTestDirectory(__filename);
 const testFiles = getTestFiles(__dirname, testDirectory);
 
 
-module.exports = function SmartFieldTest() {
+module.exports = function validatorsTest() {
   describe("validators", function() {
     if(testSingleMethod) {
       singleFileTest(__dirname, testDirectory, testFile);
