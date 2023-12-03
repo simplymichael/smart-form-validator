@@ -2,6 +2,13 @@
 
 const errorMessages = require("./error-messages");
 const { is, isSubmitBtn, validateId } = require("./helpers");
+const { addInstanceMethod, addStaticMethod } = require("./methods");
+
+const staticMethods = ["getEffects", "useEffect"];
+const instanceMethods = [
+  "addRule", "removeRule", "getField", "getFields", 
+  "getEffects", "useEffect", "toJSON", "validate", "watch"
+];
 
 
 module.exports = SmartForm;
@@ -79,17 +86,10 @@ SmartForm.prototype.addField = function addField(element, rule) {
   return this;
 };
 
-SmartForm.prototype.addRule = require("./methods/addRule");
-SmartForm.prototype.removeRule = require("./methods/removeRule");
-SmartForm.prototype.getField = require("./methods/getField");
-SmartForm.prototype.getFields = require("./methods/getFields");
-SmartForm.prototype.getEffects = require("./methods/getEffects");
-SmartForm.prototype.useEffect = require("./methods/useEffect");
-SmartForm.prototype.toJSON = require("./methods/toJSON");
-SmartForm.prototype.validate = require("./methods/validate");
-SmartForm.prototype.watch = require("./methods/watch");
+staticMethods.forEach(function bindMethodToClass(method) {
+  addStaticMethod(SmartForm, method);
+});
 
-
-// Static methods 
-SmartForm.getEffects = require("./methods/getEffects");
-SmartForm.useEffect = require("./methods/useEffect");
+instanceMethods.forEach(function bindMethodToInstance(method) {
+  addInstanceMethod(SmartForm, method);
+});

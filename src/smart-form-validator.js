@@ -1,6 +1,13 @@
 "use strict";
 
+const { addInstanceMethod, addStaticMethod } = require("./methods");
 const SmartForm = require("./smart-form");
+
+const staticMethods = ["getEffects", "useEffect"];
+const instanceMethods = [
+  "addField", "addFields", "addRule", "removeRule", "getField", "getFields",
+  "getEffects", "useEffect", "toJSON", "validate", "watch"
+];
 
 
 module.exports = SmartFormValidator;
@@ -10,9 +17,6 @@ function SmartFormValidator() {
   this.fields = [];
   this.form = null;
 }
-
-SmartFormValidator.prototype.addField = require("./methods/addField");
-SmartFormValidator.prototype.addFields = require("./methods/addFields");
 
 /**
  * Create a new SmartForm object.
@@ -40,19 +44,10 @@ SmartFormValidator.prototype.addForm = function addForm(form, rules) {
   return new SmartForm(form, rules);
 };
 
-SmartFormValidator.prototype.addRule = require("./methods/addRule");
-SmartFormValidator.prototype.removeRule = require("./methods/removeRule");
-SmartFormValidator.prototype.getField = require("./methods/getField");
-SmartFormValidator.prototype.getFields = require("./methods/getFields");
-SmartFormValidator.prototype.getEffects = require("./methods/getEffects");
-SmartFormValidator.prototype.useEffect = require("./methods/useEffect");
-SmartFormValidator.prototype.toJSON = require("./methods/toJSON");
-SmartFormValidator.prototype.validate = require("./methods/validate");
-SmartFormValidator.prototype.watch = require("./methods/watch");
+staticMethods.forEach(function bindMethodToClass(method) {
+  addStaticMethod(SmartFormValidator, method);
+});
 
-
-// Static methods 
-SmartFormValidator.getEffects = require("./methods/getEffects");
-SmartFormValidator.useEffect = require("./methods/useEffect");
-
-
+instanceMethods.forEach(function bindMethodToInstance(method) {
+  addInstanceMethod(SmartFormValidator, method);
+});

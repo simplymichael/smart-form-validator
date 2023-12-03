@@ -19,4 +19,5 @@ module.exports = {
   objectPropertyShouldHaveType: "The `:prop:` property of the `:object:` object shoulde be :type:",
   objectWithKeyExists: ":object: with key :key: already exists",
   objectWithKeyExistsCanReplace: ":object: with key `:key:` already exists. Use `:replacer:` to replace it.",
+  unknownType: "Unknown :type:: `:typeName:`, allowed :types: are :allowedTypes:",
 };
