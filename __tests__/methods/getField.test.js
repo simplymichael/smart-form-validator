@@ -1,5 +1,5 @@
 module.exports = {
-  arguments: ["input", "[, rule]"],
+  arguments: ["fieldId"],
   test: getField,
 };
 

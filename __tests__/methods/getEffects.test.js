@@ -9,7 +9,7 @@ for(const effect of Object.values(effects)) {
 }
 
 module.exports = {
-  arguments: ["input", "[, rule]"],
+  arguments: ["[type]"],
   test: getEffects,
 };
 

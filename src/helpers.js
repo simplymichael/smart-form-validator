@@ -1,5 +1,7 @@
 "use strict";
 
+const errorMessages = require("./error-messages");
+
 const APP_CLASSNAME = "sfv";
 const SMART_FIELD_CLASSNAME = "sfv-sf";
 const DISABLED_FIELD_CLASSNAME = "sfv-disabled";
@@ -25,6 +27,8 @@ module.exports = {
   is,
   object,
   generateEffectName,
+  getEffectNames,
+  preEffectRegistrationCheck,
   isSubmitBtn,
   normalizeId,
   validateId,
@@ -74,13 +78,87 @@ function cloneAndExtend(obj, newProps) {
 }
 
 function generateEffectName(name, namespace) {
+  name = is.string(name) ? name.trim() : "";
+  namespace = is.string(namespace) ? namespace.trim() : "";
+
   if(name.length > 0 && namespace.length > 0) {
-    return `${namespace}.${name}`.toLowerCase();
+    return `${namespace}.${name}`;
   } else if(name.length > 0) {
-    return name.toLowerCase();
+    return name;
   } else {
     return "";
   }
+}
+
+function getEffectNames(effects) {
+  const effectObjects = Object.values(effects);
+  const effectNames = effectObjects.map(effect => effect.name);
+
+  return effectNames;
+}
+
+function preEffectRegistrationCheck(effect, defaultEffectNames) {
+  if(!(is.object(effect))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect")
+        .replace(":type:", "an object")
+    );
+  }
+
+  let { name, meta, valid, invalid } = effect;
+
+  if(!(is.string(name))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.name")
+        .replace(":type:", "string")
+    );
+  }
+
+  let namespace = "";
+  name = name.trim();
+
+  if(!(is.function(valid))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.valid")
+        .replace(":type:", "function")
+    );
+  }
+
+  if(!(is.function(invalid))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.invalid")
+        .replace(":type:", "function")
+    );
+  }
+
+  if(is.object(meta) && is.string(meta.namespace)) {
+    namespace = meta.namespace.trim();
+  }
+
+  const effectName = generateEffectName(name, namespace);
+
+  if(effectName.length === 0) {
+    throw new TypeError(
+      errorMessages.fieldCannotBeEmpty
+        .replace(":field:", "effect.name")
+        .replace(":type:", "string")
+    );
+  }
+
+  if(defaultEffectNames.includes(effectName)) {
+    throw new TypeError(
+      errorMessages.argNamesAreReserved
+        .replace(":argNames:", "names")
+        .replace(":argTypes:", "effect names")
+        .replace(":argValues:", defaultEffectNames.join("\n"))
+    );
+  }
+
+  return { ...effect, name: effectName };
 }
 
 function isSubmitBtn(element) {

@@ -8,6 +8,8 @@ const {
   is,
   object,
   generateEffectName,
+  getEffectNames,
+  preEffectRegistrationCheck,
   isSubmitBtn,
   normalizeId,
   validateId,
@@ -15,7 +17,7 @@ const {
 const defaultValidators = require("./validators");
 
 const defaultEffects = Object.values(effects);
-const defaultEffectNames = defaultEffects.map(effect => effect.name);
+const defaultEffectNames = getEffectNames(effects);
 const defaultValidatorEntries = Object.entries(defaultValidators);
 const defaultValidatorKeys = Object.keys(defaultValidators);
 
@@ -231,7 +233,6 @@ SmartField.prototype.getEffects = function getActiveEffects(type) {
  * 
  * @param {Object} effect: 
  * @param {String} [effect.name] (required): The name of this effect, used when registering the effect.
- * @param {Object} [effect.meta] (optional): Effect meta data, e.g., namespace, author, version, etc.
  * @param {Function} [effects.init] (optional): Function that performs any initialization function.
  *    The function is invoked right after the effect is registered.
  *    It receives the current input field as its first argument.
@@ -239,68 +240,15 @@ SmartField.prototype.getEffects = function getActiveEffects(type) {
  *    The function receives the validated input field as its first argument.
  * @param {Function} [effect.invalid] (required): Function to invoke post-validation if the field is invalid.
  *    The function is passed the validated input field as its first argument
+ * @param {Object} [effect.meta] (optional): Effect meta data, e.g., namespace, author, version, etc.
+ * @param {String} [effect.meta.namespace]: used in conjunction with the effect `name` 
+ *    to create a unique name for the effect.
  * @returns this.
  */
 SmartField.prototype.useEffect = function useEffect(effect) {
-  if(!(is.object(effect))) {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "effect")
-        .replace(":type:", "object")
-    );
-  }
+  const parsedEffect = preEffectRegistrationCheck(effect, defaultEffectNames);
 
-  let { name, meta, init, valid, invalid } = effect;
-
-  if(!(is.string(name))) {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "effect.name")
-        .replace(":type:", "string")
-    );
-  }
-
-  let namespace = "";
-  name = name.trim();
-
-  if(!(is.function(valid))) {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "effect.valid")
-        .replace(":type:", "function")
-    );
-  }
-
-  if(!(is.function(invalid))) {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "effect.invalid")
-        .replace(":type:", "function")
-    );
-  }
-
-  if(is.object(meta) && is.string(meta.namespace)) {
-    namespace = meta.namespace.trim();
-  }
-
-  const effectName = generateEffectName(name, namespace);
-
-  if(effectName.length === 0) {
-    throw new TypeError(
-      errorMessages.fieldCannotBeEmpty
-        .replace(":field:", "effect.name")
-        .replace(":type:", "string")
-    );
-  }
-
-  if(defaultEffectNames.includes(effectName)) {
-    throw new TypeError(
-      errorMessages.argNamesAreReserved
-        .replace(":argNames:", "names")
-        .replace(":argTypes:", "effect names")
-        .replace(":argValues:", defaultEffectNames.join("\n"))
-    );
-  }
+  let { name: effectName, meta, init, valid, invalid } = parsedEffect;
 
   if(this.usesEffect(effectName)) {
     throw new TypeError(
@@ -310,7 +258,7 @@ SmartField.prototype.useEffect = function useEffect(effect) {
     );
   }
 
-  this.effects.set(effectName, { meta, valid, invalid });
+  this.effects.set(effectName, { meta, init, valid, invalid });
 
   if(is.function(init)) {
     init(this.getElement());

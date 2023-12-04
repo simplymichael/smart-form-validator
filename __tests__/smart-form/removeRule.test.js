@@ -1,5 +1,5 @@
 module.exports = {
-  arguments: ["fieldId", "[, ruleKey]"],
+  arguments: ["[ruleKey]"],
   test: removeRule,
 };
 
