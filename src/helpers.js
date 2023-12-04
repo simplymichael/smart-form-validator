@@ -112,7 +112,7 @@ function preEffectRegistrationCheck(effect, defaultEffectNames) {
     throw new TypeError(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.name")
-        .replace(":type:", "string")
+        .replace(":type:", "a string")
     );
   }
 
@@ -123,7 +123,7 @@ function preEffectRegistrationCheck(effect, defaultEffectNames) {
     throw new TypeError(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.valid")
-        .replace(":type:", "function")
+        .replace(":type:", "a function")
     );
   }
 
@@ -131,7 +131,7 @@ function preEffectRegistrationCheck(effect, defaultEffectNames) {
     throw new TypeError(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.invalid")
-        .replace(":type:", "function")
+        .replace(":type:", "a function")
     );
   }
 

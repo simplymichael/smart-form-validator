@@ -22,7 +22,7 @@ module.exports = function emailValidator(value, rule) {
     return true; // if the "email" rule has not been defined for this value, bypass this validator
   }
 
-  if(!value) {
+  if(!value || typeof value !== "string") {
     return false;
   }
   

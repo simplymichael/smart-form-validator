@@ -17,7 +17,7 @@ module.exports = function alphaValidator(value, rule) {
     return true; // if the "alpha" rule has not been defined for this value, bypass this validator
   }
 
-  if(!value) {
+  if(!value || typeof value !== "string") {
     return false;
   }
   

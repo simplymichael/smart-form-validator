@@ -34,7 +34,7 @@ module.exports = SmartField;
  *    as `<input type="submit" />`. In such cases, if we want effects that work with submit buttons 
  *    to have access to the button, we have to give the element a role of "submit-button", e.g. 
  *    `<button role="submit-button">Submit</button>`.
- * @param {Function} [element.getValue] (optional): A function to get the element value.
+ * @param {Function} [element.getValue] (optional): A function to get the element's value.
  *    The function should return the element's value when called.
  *    If the element is an HTML element such as `input`, `select`, `checkbox`, or a contenteditable field, 
  *    this property is optional, and the element's value can be retrieved automatically. 

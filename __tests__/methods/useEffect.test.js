@@ -64,7 +64,7 @@ function useEffect(it, expect) {
     expect(context.useEffect.bind(context, effect)).to.throw(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.name")
-        .replace(":type:", "string")
+        .replace(":type:", "a string")
     );
   });
 
@@ -82,25 +82,25 @@ function useEffect(it, expect) {
     expect(context.useEffect.bind(context, { ...effect, name: null })).to.throw(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.name")
-        .replace(":type:", "string")
+        .replace(":type:", "a string")
     );
 
     expect(context.useEffect.bind(context, { ...effect, name: undefined })).to.throw(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.name")
-        .replace(":type:", "string")
+        .replace(":type:", "a string")
     );
 
     expect(context.useEffect.bind(context, { ...effect, name: [] })).to.throw(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.name")
-        .replace(":type:", "string")
+        .replace(":type:", "a string")
     );
 
     expect(context.useEffect.bind(context, { ...effect, name: {} })).to.throw(
       errorMessages.functionParamExpectsType
         .replace(":param:", "effect.name")
-        .replace(":type:", "string")
+        .replace(":type:", "a string")
     );
   });
 
@@ -177,10 +177,213 @@ function useEffect(it, expect) {
       }
     };
 
+    const effect2 = { 
+      name: "test-effect",
+      init: () => {},
+      valid: () => {},
+      invalid: () => {}, 
+      meta: {
+        namespace: "",
+      }
+    };
+
+    const effect2Namespaced = { 
+      ...effect2, 
+      meta: { 
+        ...effect2.meta, 
+        namespace: "test" 
+      }
+    };
+
     const defaultEffectNames = getEffectNames(effects);
 
+    // Using default effect names, but with a different namespace
     defaultEffectNames.forEach(effectName => {
       expect(context.useEffect.bind(context, { ...effect, name: effectName })).not.to.throw();
     });
+
+    // Using addon effect name, but with different namespaces (one with, and one without, a namespace)
+    expect(context.useEffect.bind(context, effect2)).not.to.throw();
+    expect(context.useEffect.bind(context, effect2)).to.throw(
+      errorMessages.objectWithKeyExists
+        .replace(":object:", "An effect")
+        .replace(":key:", effect2.name)
+    );
+    expect(context.useEffect.bind(context, effect2Namespaced)).not.to.throw();
+  });
+
+  it("should throw an error if the `valid` property of the `effect` object is not a function", function() {
+    const context = this.test.context;
+    const effect = { 
+      name: "test-effect",
+      init: () => {},
+      invalid: () => {}, 
+      meta: {
+        namespace: "test",
+      }
+    };
+
+    expect(context.useEffect.bind(context, { ...effect, valid: null })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.valid")
+        .replace(":type:", "a function")
+    );
+
+    expect(context.useEffect.bind(context, { ...effect, valid: undefined })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.valid")
+        .replace(":type:", "a function")
+    );
+
+    expect(context.useEffect.bind(context, { ...effect, valid: [] })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.valid")
+        .replace(":type:", "a function")
+    );
+
+    expect(context.useEffect.bind(context, { ...effect, valid: {} })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.valid")
+        .replace(":type:", "a function")
+    );
+  });
+
+  it("should throw an error if the `invalid` property of the `effect` object is not a function", function() {
+    const context = this.test.context;
+    const effect = { 
+      name: "test-effect",
+      init: () => {},
+      valid: () => {}, 
+      meta: {
+        namespace: "test",
+      }
+    };
+
+    expect(context.useEffect.bind(context, { ...effect, invalid: null })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.invalid")
+        .replace(":type:", "a function")
+    );
+
+    expect(context.useEffect.bind(context, { ...effect, invalid: undefined })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.invalid")
+        .replace(":type:", "a function")
+    );
+
+    expect(context.useEffect.bind(context, { ...effect, invalid: [] })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.invalid")
+        .replace(":type:", "a function")
+    );
+
+    expect(context.useEffect.bind(context, { ...effect, invalid: {} })).to.throw(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "effect.invalid")
+        .replace(":type:", "a function")
+    );
+  });
+
+  it("should register the effect on the 'context' object", function() {
+    const context = this.test.context;
+    const effect = { 
+      name: "test-effect",
+      init: () => {},
+      valid: () => {},
+      invalid: () => {}, 
+      meta: {
+        namespace: "",
+      }
+    };
+
+    expect(context.useEffect.bind(context, effect)).not.to.throw();
+
+    const effects = context.getEffects();
+    const { name: _, ...registeredEffect } = effect; // eslint-disable-line
+
+    expect(effects).to.be.an("object");
+    expect(Object.keys(effects)).to.have.length(2);
+    expect(effects).to.have.property("default");
+    expect(effects).to.have.property("addon");
+    expect(effects.default).to.be.an("object");
+    expect(effects.addon).to.be.an("object");
+    expect(Object.keys(effects.addon)).to.have.length(1);
+    expect(Object.keys(effects.addon)[0]).to.equal(effect.name);
+    expect(Object.values(effects.addon)[0]).to.deep.equal(registeredEffect);
+  });
+
+  it("should register the effect on each field of the 'context' object, if any", function() {
+    const context = this.test.context;
+    // The `setAttribute` and `classList` are to mimic their respective counterparts 
+    // on an HTML <input type="submit" ... 
+    // This is to avoid throwing any errors during effect registration for the toggle-submit-button effect
+    const syntheticSubmitBtn = { 
+      type: "submit", 
+      classes: [],
+      setAttribute: (k, v) => this[k] = v, 
+      classList: {
+        add: (className) => syntheticSubmitBtn.classes.push(className),
+        remove: (className) => syntheticSubmitBtn.classes = syntheticSubmitBtn.classes.filter(c => c !== className)
+      },
+    };
+
+    const effect = { 
+      name: "test-effect",
+      init: () => {},
+      valid: () => {},
+      invalid: () => {}, 
+      meta: {
+        namespace: "",
+      }
+    };
+
+    context.addField({ id: "firstname-field" }, { fieldId: "firstname-field", required: true });
+    context.addField(syntheticSubmitBtn);
+
+    expect(context.useEffect.bind(context, effect)).not.to.throw();
+
+    const effects = context.getEffects();
+    const { name: _, ...registeredEffect } = effect; // eslint-disable-line
+
+    expect(effects).to.be.an("object");
+    expect(Object.keys(effects)).to.have.length(2);
+    expect(effects).to.have.property("default");
+    expect(effects).to.have.property("addon");
+    expect(effects.default).to.be.an("object");
+    expect(effects.addon).to.be.an("object");
+    expect(Object.keys(effects.addon)).to.have.length(1);
+    expect(Object.keys(effects.addon)[0]).to.equal(effect.name);
+    expect(Object.values(effects.addon)[0]).to.deep.equal(registeredEffect);
+
+    context.getFields().forEach(function validateFieldHasEffectRegistered(field) {
+      expect(field.usesEffect(effect.name)).to.equal(true);
+    });
+  });
+
+  it("the `effect.init` function is optional", function() {
+    const context = this.test.context;
+    const effect = { 
+      name: "test-effect",
+      valid: () => {},
+      invalid: () => {}, 
+      meta: {
+        namespace: "",
+      }
+    };
+
+    expect(context.useEffect.bind(context, effect)).not.to.throw();
+
+    const effects = context.getEffects();
+    const { name: _, ...registeredEffect } = effect; // eslint-disable-line
+
+    expect(effects).to.be.an("object");
+    expect(Object.keys(effects)).to.have.length(2);
+    expect(effects).to.have.property("default");
+    expect(effects).to.have.property("addon");
+    expect(effects.default).to.be.an("object");
+    expect(effects.addon).to.be.an("object");
+    expect(Object.keys(effects.addon)).to.have.length(1);
+    expect(Object.keys(effects.addon)[0]).to.equal(effect.name);
+    expect(Object.values(effects.addon)[0]).to.deep.equal({ ...registeredEffect, init: undefined });
   });
 }
