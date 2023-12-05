@@ -1,4 +1,5 @@
-const { is, APP_CLASSNAME, DISABLED_FIELD_CLASSNAME } = require("../../helpers");
+const { APP_CLASSNAME, DISABLED_FIELD_CLASSNAME } = require("../../helpers");
+const { isSubmitButton } = require("../effects-helpers");
 
 
 module.exports = {
@@ -27,15 +28,11 @@ function handleInvalid(field) {
 // Helper methods
 function canSubmitForm(validationPassed, input) {
   try {
-    if(!(is.object(input)) || input.type !== "submit") {
+    if(!isSubmitButton(input)) {
       return;
     }
 
     const submitBtn = input;
-
-    if(!submitBtn) {
-      return;
-    }
 
     if(validationPassed) {
       submitBtn.removeAttribute("disabled");

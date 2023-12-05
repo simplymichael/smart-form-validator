@@ -1,4 +1,5 @@
 const { is, VALID_FIELD_CLASSNAME, INVALID_FIELD_CLASSNAME } = require("../../helpers");
+const { isSubmitButton } = require("../effects-helpers");
 
 
 module.exports = {
@@ -10,7 +11,7 @@ module.exports = {
 
 
 function handleValid(field) {
-  if(!(is.object(field)) || field.type === "submit") {
+  if(!(is.object(field)) || isSubmitButton(field)) {
     return;
   }
 
@@ -19,7 +20,7 @@ function handleValid(field) {
 }
   
 function handleInvalid(field) {
-  if(!(is.object(field)) || field.type === "submit") {
+  if(!(is.object(field)) || isSubmitButton(field)) {
     return;
   }
 
