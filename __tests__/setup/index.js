@@ -5,6 +5,8 @@ const chaidom = require("chai-dom");
 const jsdom = require("jsdom");
 const jsdomGlobal = require("jsdom-global");
 const mocha = require("mocha");
+const sinon = require("sinon");
+const sinonChai = require("sinon-chai");
 
 const { expect } = chai;
 const { JSDOM } = jsdom;
@@ -17,6 +19,7 @@ const INVALID_FIELD_CLASSNAME = "sfv-error";
 
 
 chai.use(chaidom);
+chai.use(sinonChai);
 jsdomGlobal();
 
 
@@ -34,6 +37,7 @@ module.exports = {
   it, 
   expect,
   describe,
+  sinon,
   APP_CLASSNAME, 
   DISABLED_FIELD_CLASSNAME,
   SMART_FIELD_CLASSNAME,
