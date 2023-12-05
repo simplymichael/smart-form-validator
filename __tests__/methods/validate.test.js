@@ -1,3 +1,5 @@
+const { wrapWithDOMFunctionality } = require("../test-helpers");
+
 module.exports = {
   arguments: [],
   test: validate,
@@ -34,7 +36,7 @@ const emailRules = { fieldId: emailField.id, type: "email" };
 const phoneNumberRules = { fieldId: phoneNumberField.id, type: "number", length: { min: 7 } };
 
 
-function validate(it, expect) { // eslint-disable-line
+function validate(it, expect) {
   it("should return false if one or more fields fail validation", function() {
     const context = this.test.context;
 
@@ -99,19 +101,4 @@ function validate(it, expect) { // eslint-disable-line
 
     expect(context.validate()).to.equal(true);
   });
-}
-
-
-// Helpers
-function wrapWithDOMFunctionality(obj) {
-  const newObj = Object.create({ classes: [] });
-  const syntheticProperties = { 
-    setAttribute: (k, v) => this[k] = v, 
-    classList: {
-      add: (className) => newObj.classes.push(className),
-      remove: (className) => newObj.classes = newObj.classes.filter(c => c !== className)
-    },
-  };
-
-  return Object.assign({}, obj, newObj, syntheticProperties);
 }

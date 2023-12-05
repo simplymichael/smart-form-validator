@@ -1,4 +1,5 @@
 const errorMessages = require("../../src/error-messages");
+const { wrapWithDOMFunctionality } = require("../test-helpers");
 
 
 module.exports = {
@@ -102,24 +103,12 @@ function addField(it, expect) {
 
   it("should add the field if it has no `id` property but has a `type` of `submit`", function() {
     const context = this.test.context;
+    const submitBtn = wrapWithDOMFunctionality({ type: "submit" });
 
     expect(context.getFields()).to.be.an("array");
     expect(context.getFields()).to.have.length(0);
 
-    // The `setAttribute` and `classList` are to mimic their respective counterparts 
-    // on an HTML <input type="submit" ... 
-    // This is to avoid throwing any errors during effect registration for the toggle-submit-button effect
-    const syntheticSubmitBtn = { 
-      type: "submit", 
-      classes: [],
-      setAttribute: (k, v) => this[k] = v, 
-      classList: {
-        add: (className) => syntheticSubmitBtn.classes.push(className),
-        remove: (className) => syntheticSubmitBtn.classes = syntheticSubmitBtn.classes.filter(c => c !== className)
-      },
-    };
-
-    context.addField(syntheticSubmitBtn);
+    context.addField(submitBtn);
 
     expect(context.getFields()).to.be.an("array");
     expect(context.getFields()).to.have.length(1);

@@ -1,6 +1,7 @@
 const effects = require("../../src/effects");
 const errorMessages = require("../../src/error-messages");
 const { getEffectNames } = require("../../src/helpers");
+const { wrapWithDOMFunctionality } = require("../test-helpers");
 
 
 module.exports = {
@@ -314,18 +315,7 @@ function useEffect(it, expect) {
 
   it("should register the effect on each field of the 'context' object, if any", function() {
     const context = this.test.context;
-    // The `setAttribute` and `classList` are to mimic their respective counterparts 
-    // on an HTML <input type="submit" ... 
-    // This is to avoid throwing any errors during effect registration for the toggle-submit-button effect
-    const syntheticSubmitBtn = { 
-      type: "submit", 
-      classes: [],
-      setAttribute: (k, v) => this[k] = v, 
-      classList: {
-        add: (className) => syntheticSubmitBtn.classes.push(className),
-        remove: (className) => syntheticSubmitBtn.classes = syntheticSubmitBtn.classes.filter(c => c !== className)
-      },
-    };
+    const submitBtn = wrapWithDOMFunctionality({ type: "submit" });
 
     const effect = { 
       name: "test-effect",
@@ -338,7 +328,7 @@ function useEffect(it, expect) {
     };
 
     context.addField({ id: "firstname-field" }, { fieldId: "firstname-field", required: true });
-    context.addField(syntheticSubmitBtn);
+    context.addField(submitBtn);
 
     expect(context.useEffect.bind(context, effect)).not.to.throw();
 

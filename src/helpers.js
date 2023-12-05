@@ -26,11 +26,12 @@ const object = {
 module.exports = {
   is,
   object,
+  createListFromArray,
   generateEffectName,
   getEffectNames,
-  preEffectRegistrationCheck,
   isSubmitBtn,
   normalizeId,
+  preEffectRegistrationCheck,
   validateId,
   APP_CLASSNAME,
   DISABLED_FIELD_CLASSNAME,
@@ -77,6 +78,14 @@ function cloneAndExtend(obj, newProps) {
   }
 }
 
+function createListFromArray(array, combinator) {
+  if(typeof combinator !== "string") {
+    combinator = "\t\n* ";
+  }
+
+  return `${combinator}${array.join(combinator)}`;
+}
+
 function generateEffectName(name, namespace) {
   name = is.string(name) ? name.trim() : "";
   namespace = is.string(namespace) ? namespace.trim() : "";
@@ -95,6 +104,14 @@ function getEffectNames(effects) {
   const effectNames = effectObjects.map(effect => effect.name);
 
   return effectNames;
+}
+
+function isSubmitBtn(element) {
+  return element.type === "submit" || element.role === "submit-button";
+}
+
+function normalizeId(id) {
+  return String(id).trim();
 }
 
 function preEffectRegistrationCheck(effect, defaultEffectNames) {
@@ -159,14 +176,6 @@ function preEffectRegistrationCheck(effect, defaultEffectNames) {
   }
 
   return { ...effect, name: effectName };
-}
-
-function isSubmitBtn(element) {
-  return element.type === "submit" || element.role === "submit-button";
-}
-
-function normalizeId(id) {
-  return String(id).trim();
 }
 
 function validateId(id) {

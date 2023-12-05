@@ -1,4 +1,5 @@
 const errorMessages = require("../error-messages");
+const { createListFromArray } = require("../helpers");
 
 const instanceMethodNames = [
   "addField",
@@ -39,10 +40,10 @@ function addInstanceMethod(ctor, methodName) {
   if(!instanceMethodNames.includes(methodName)) {
     throw new TypeError(
       errorMessages.unknownType
-        .replace(":type:", "method")
+        .replace(":type:", "instance method")
         .replace(":typeName:", methodName)
         .replace(":types:", "methods")
-        .replace(":allowedTypes:", instanceMethodNames.join("\n"))
+        .replace(":allowedTypes:", createListFromArray(instanceMethodNames))
     );
   }
 
@@ -66,10 +67,10 @@ function addStaticMethod(ctor, methodName) {
   if(!staticMethodNames.includes(methodName)) {
     throw new TypeError(
       errorMessages.unknownType
-        .replace(":type:", "method")
+        .replace(":type:", "static method")
         .replace(":typeName:", methodName)
         .replace(":types:", "methods")
-        .replace(":allowedTypes:", staticMethodNames.join("\n"))
+        .replace(":allowedTypes:", createListFromArray(staticMethodNames))
     );
   }
   

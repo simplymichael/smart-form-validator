@@ -7,6 +7,7 @@ module.exports = {
   getTestFile,
   getTestFiles,
   singleFileTest,
+  wrapWithDOMFunctionality,
 };
 
 function getTestDirectory(testFile) {
@@ -25,9 +26,21 @@ function getTestFile() {
 function getTestFiles(rootDirectory, testDirectory) {
   const testFiles = fs.readdirSync(path.join(rootDirectory, testDirectory));
   const constructorFile = testFiles.filter(file => file.indexOf("constructor.test.js") > -1);
-  const otherFiles = testFiles.filter(file => file.indexOf("constructor.test.js") === -1);
+  const indexFile = testFiles.filter(file => file.indexOf("index.test.js") > -1);
+  let otherFiles;
+  let returnFiles;
 
-  return constructorFile.concat(otherFiles);
+  if(constructorFile.length > 0) {
+    otherFiles = testFiles.filter(file => file.indexOf("constructor.test.js") === -1);
+    returnFiles = constructorFile.concat(otherFiles);
+  } else if(indexFile.length > 0) {
+    otherFiles = testFiles.filter(file => file.indexOf("index.test.js") === -1);
+    returnFiles = indexFile.concat(otherFiles);
+  } else {
+    returnFiles = testFiles;
+  }
+
+  return returnFiles;
 }
 
 function singleFileTest(rootDirectory, testDirectory, testFile) {
@@ -36,4 +49,20 @@ function singleFileTest(rootDirectory, testDirectory, testFile) {
   describe(testFile.replace(".test.js", `(${testArguments.join(" ")})`), () => {
     test(it, expect);
   });
+}
+
+// The `setAttribute` and `classList` are to mimic their respective counterparts 
+// on an HTML <input type="submit" ... 
+// This is to avoid throwing any errors during effect registration for the toggle-submit-button effect
+function wrapWithDOMFunctionality(obj) {
+  const newObj = Object.create({ classes: [] });
+  const syntheticProperties = { 
+    setAttribute: (k, v) => this[k] = v, 
+    classList: {
+      add: (className) => newObj.classes.push(className),
+      remove: (className) => newObj.classes = newObj.classes.filter(c => c !== className)
+    },
+  };
+
+  return Object.assign({}, obj, newObj, syntheticProperties);
 }
