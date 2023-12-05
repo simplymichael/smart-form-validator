@@ -44,8 +44,7 @@ function SmartForm(form, rules) {
 
   if(!is.object(form)) {
     throw new TypeError(
-      errorMessages
-        .htmlElementExpected
+      errorMessages.htmlElementExpected
         .replace(":param:", "form")
         .replace(":elementType:", "form")
     );

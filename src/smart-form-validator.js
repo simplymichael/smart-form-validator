@@ -20,7 +20,8 @@ function SmartFormValidator() {
 
 /**
  * Create a new SmartForm object.
- * @param {Object} the HTML form element to add validation routine to.
+ * @param {Object|String} the HTML form element to add validation routine to.
+ *    This can be the HTML form object if we already have it, or its ID.
  * @param {Array} rules (optional): array of objects specifying the validation rules for the form's elements.
  * @param {String} [rules[i].fieldId]: the id of the input field to apply these rules to
  * @param {Boolean} [rules[i].required]: specifies whether the field is required (true) or not (false)
@@ -41,7 +42,11 @@ function SmartFormValidator() {
  * either here or by calling the addRule(rule) method on the returned SmartForm instance.
  */
 SmartFormValidator.prototype.addForm = function addForm(form, rules) {
-  return new SmartForm(form, rules);
+  const smartForm = new SmartForm(form, rules);
+
+  this.form = smartForm.form;
+
+  return smartForm;
 };
 
 staticMethods.forEach(function bindMethodToClass(method) {

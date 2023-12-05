@@ -4,10 +4,11 @@ const SmartField = require("../smart-field");
 
 /**
  * Add a new field for validation
- * @param {Object} input: the field to validate. The field must have an `id` property.
+ * @param {Object|String} input: the field to validate. The field must have an `id` property.
+ *    This can be the HTML element itself if we already have it, or its ID.
  * @param {String} [input.id] (required): the id of the element 
  * @param {String} [input.role] (optional): the role of the element. 
- *    This can be particularly usefule for identifying submit buttons that are not defined 
+ *    This can be particularly useful for identifying submit buttons that are not defined 
  *    as `<input type="submit" />`. In such cases, if we want effects that work with submit buttons 
  *    to have access to the button, we have to give the element a role of "submit-button", e.g. 
  *    `<button role="submit-button">Submit</button>`.
@@ -25,6 +26,10 @@ const SmartField = require("../smart-field");
  * @returns this
  */
 module.exports = function addField(input, rule) {
+  if(typeof input === "string") {
+    input = document.getElementById(input);
+  }
+
   if(!is.object(input)) {
     throw new TypeError(
       errorMessages.functionParamExpectsType
