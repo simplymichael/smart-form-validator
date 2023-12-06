@@ -9,7 +9,9 @@ const errorMessages = require("../error-messages");
  *   will receive the input field element as the first argument,
  *   and a boolean indicating the validation result as the second argument.
  *   On completion of validation (when every element has been validated), 
- *   the function will be invoked with the form element (if any), 
+ *   the function will be invoked with either 
+ *      - the form element (if any), or 
+ *      - the SmartFormValidator instance
  *   and the result of the entire validation, 
  *   that is, whether all fields are valid (true) or not (false).
  * @return {Object} with a `valid()` method. The method returns:
@@ -17,7 +19,7 @@ const errorMessages = require("../error-messages");
  */
 module.exports = function validateFormFields(callback) {
   let formValid = false;
-  const form = this.form;
+  const form = this.form || this; // when we are using SmartFormValidator instance for isolated elements without an underlying form element.
   const fields = this.getFields();
   const inputFields = fields.filter(f => !(isSubmitButton(f)));
   const submitButton = fields.find(isSubmitButton)?.getElement();
