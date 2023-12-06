@@ -1,15 +1,7 @@
 const { beforeEach } = require("mocha");
 const SmartForm = require( "../../src/smart-form");
 const SmartFormValidator = require( "../../src/smart-form-validator");
-
-const {
-  sinon,
-  APP_CLASSNAME, 
-  DISABLED_FIELD_CLASSNAME,
-  SMART_FIELD_CLASSNAME,
-  VALID_FIELD_CLASSNAME, 
-  INVALID_FIELD_CLASSNAME,
-} = require("../setup");
+const { sinon } = require("../setup");
 
 
 module.exports = {
@@ -23,61 +15,43 @@ function watch(it, expect) {
     const formId = "signup-form";
     const form = $(`#${formId}`); // eslint-disable-line
     const formElements = form.elements;
-    const submitBtn = $("[role='submit-button']"); // eslint-disable-line
 
     this.currentTest.formId = formId;
     this.currentTest.form = form;
     this.currentTest.formElements = formElements;
-    this.currentTest.submitBtn = submitBtn;
 
     done();
   });
 
   it("should watch elements on a SmartForm instance", function() {
+    let formState;
     let nameFieldValid = false; 
     let usernameFieldValid = false;
     let emailFieldValid = false;
-
-    const formId = this.test.formId;
-    const formElements = this.test.formElements;
-    const submitBtn = this.test.submitBtn;
     let validationCallbackSpy = sinon.spy();
-    const resetValidationCallbackSpy = function() {
-      validationCallbackSpy = sinon.spy();
-    };
-    const validationCallback = function(element, valid) {
-      validationCallbackSpy(element, valid); // This lets us know if our validation callback was invoked.
 
-      if(element.id === "name-field") {
-        expect(valid).to.equal(nameFieldValid);
-      } else if(element.id === "username-field") {
-        expect(valid).to.equal(usernameFieldValid);
-      } else if(element.id === "email-field") {
-        expect(valid).to.equal(emailFieldValid);
-      } else if(element.id === formId) {
+    const { form, formId, formElements } = this.test;
+    const resetValidationCallbackSpy = () => validationCallbackSpy = sinon.spy();
+    const validationCallback = function validationCallback(element, valid) {
+      // The calls to the Sinon spy lets us know if our validation callback was invoked.
+
+      if(element.id === formId) {
         // every field has been validated, validation is complete
+        validationCallbackSpy(form, nameFieldValid && usernameFieldValid && emailFieldValid);
         expect(valid).to.equal(nameFieldValid && usernameFieldValid && emailFieldValid);
+        expect(formState.valid()).to.equal(valid);
+      } else {
+        validationCallbackSpy(element, valid);
 
-        if(!valid) {
-          expect(submitBtn.classList.contains(DISABLED_FIELD_CLASSNAME)).to.equal(true);
-        } else {
-          expect(submitBtn.classList.contains(DISABLED_FIELD_CLASSNAME)).to.equal(false);
-        }
-      }
-
-      if(["name-field", "username-field", "email-field"].includes(element.id)) {
-        expect(element.classList.contains(APP_CLASSNAME)).to.equal(true);
-        expect(element.classList.contains(SMART_FIELD_CLASSNAME)).to.equal(true);
-
-        if(!valid) {
-          expect(element.classList.contains(INVALID_FIELD_CLASSNAME)).to.equal(true);
-        } else {
-          expect(element.classList.contains(VALID_FIELD_CLASSNAME)).to.equal(true);
+        switch(element.id) {
+        case "name-field": expect(valid).to.equal(nameFieldValid); break;
+        case "username-field": expect(valid).to.equal(usernameFieldValid); break;
+        case "email-field": expect(valid).to.equal(emailFieldValid); break;
         }
       }
     };
 
-    const formState = (
+    formState = (
       new SmartForm(formId)
         .addRule({ field: "name-field", type: "ascii", length: { min: 3, max: 7 } })
         .addRule({ field: "username-field", type: "alpha", length: { min: 3, max: 7 } })
@@ -88,6 +62,29 @@ function watch(it, expect) {
     expect(formState).to.be.an("object");
     expect(formState).to.have.property("valid");
     expect(formState.valid).to.be.a("function");
+
+    const nameField = $("#name-field"); // eslint-disable-line
+    const usernameField = $("#username-field"); // eslint-disable-line
+    const emailField = $("#email-field"); // eslint-disable-line
+
+    nameField.setAttribute("value", "John");
+    usernameField.setAttribute("value", "johndoe");
+    emailField.setAttribute("value", "john@doe-family.com");
+
+    nameFieldValid = true;
+    usernameFieldValid = true;
+    emailFieldValid = true;
+
+    nameField.dispatchEvent(new Event("input", { bubbles: true }));
+    usernameField.dispatchEvent(new Event("input", { bubbles: true }));
+    emailField.dispatchEvent(new Event("input", { bubbles: true }));
+
+    expect(validationCallbackSpy).to.have.been.calledWith(nameField, true);
+    expect(validationCallbackSpy).to.have.been.calledWith(usernameField, true);
+    expect(validationCallbackSpy).to.have.been.calledWith(emailField, true);
+    expect(validationCallbackSpy).to.have.been.calledWith(form, true);
+
+    resetValidationCallbackSpy();
 
     Array.from(formElements).forEach(function assertWatchingElement(element) {
       if(element.id === "name-field") {

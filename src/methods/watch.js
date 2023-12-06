@@ -18,7 +18,6 @@ const errorMessages = require("../error-messages");
 module.exports = function validateFormFields(callback) {
   let formValid = false;
   const form = this.form;
-  const validatedFields = {};
   const fields = this.getFields();
   const inputFields = fields.filter(f => !(isSubmitButton(f)));
   const submitButton = fields.find(isSubmitButton)?.getElement();
@@ -31,51 +30,43 @@ module.exports = function validateFormFields(callback) {
     instanceEffects.default, instanceEffects.addon
   );
   const effectFns = Object.values(effects);
+  const validationCallback = getValidationCallback();
   
-  inputFields.forEach(field => {
+  inputFields.forEach(function observeField(field) {
     const input = field.getElement();
-    let targetEvent;
   
-    switch(input.type) {
-    case "checkbox" : targetEvent = "click"; break;
-    case "email"    :
-    case "password" : 
-    case "text"     : 
-    default         : targetEvent = "input"; break;
-    }
-  
-    input.addEventListener(targetEvent, () => {
-      const valid = field.validate();
-      validationCallback(field, valid);
-      if(typeof callback === "function") {
-        callback(input, valid);
-      }
-    });
+    input.addEventListener(getListenerEvent(input), getChangeProcessor(field, input));
   });
   
   return {
     valid: () => formValid,
   };
 
-  function isSubmitButton(field) {
-    return field.role === "submit-button";
-  }
-  
-  function validationCallback(field, valid) {
-    validatedFields[field.id] = validatedFields[field.id] || {};
-    validatedFields[field.id].valid = valid;
-  
-    if(Object.keys(validatedFields).length === rules.length) {
-      formValid = Object.values(validatedFields).every(field => field.valid);
+  /**
+   * @param {Object} field: SmartField instance
+   * @param {Object} input: the underlying HTML Element of the SmartField instance 
+   * @returns {Function} an event listener function
+   */
+  function getChangeProcessor(field, input) {
+    return function processInputChange() {
+      const valid = field.validate();
+      const validationState = validationCallback(field, valid, rules);
+
+      formValid = validationState.formValid;
 
       if(typeof callback === "function") {
-        callback(form, formValid);
-      }
-    }
+        callback(input, valid);
 
-    applyEffects(formValid, effectFns, submitButton);
+        if(validationState.allFieldsValidated) {
+          callback(form, formValid);
+        }
+      }
+
+      applyEffects(formValid, effectFns, submitButton);
+    };
   }
 };
+
 
 // Helpers
 function applyEffects(validationPassed, effects, submitButton) {
@@ -90,4 +81,55 @@ function applyEffects(validationPassed, effects, submitButton) {
       invalid(submitButton);
     }
   });
+}
+
+function isSubmitButton(smartField) {
+  return smartField.role === "submit-button";
+}
+
+/**
+ * Get the event we should listen for on an element.
+ * @param {Object} input: HTML (input) element
+ * @return {Object} the event to listen for on the element
+ */
+function getListenerEvent(input) {
+  let targetEvent;
+
+  switch(input.type) {
+  case "checkbox" : targetEvent = "click"; break;
+  case "email"    :
+  case "password" : 
+  case "text"     : 
+  default         : targetEvent = "input"; break;
+  }
+
+  return targetEvent;
+}
+
+/**
+ * @param void 
+ * @returns function. 
+ * The returned function takes and returns the following parameters and return value: 
+ *    @param {Object} field: SmartField instance
+ *    @param {Boolean} valid: whether the current field passed validation or not
+ *    @param {Array} rules: Array of the all the rules for all the fields being validated, not just for the current field.
+ *    @returns {Object}
+ */
+function getValidationCallback() {
+  let validatedFields = {};
+
+  return function validationCallback(field, valid, rules) {
+    let formValid = false;
+    let allFieldsValidated = false;
+
+    validatedFields[field.id] = validatedFields[field.id] || {};
+    validatedFields[field.id].valid = valid;
+  
+    if(Object.keys(validatedFields).length === rules.length) {
+      allFieldsValidated = true;
+      formValid = Object.values(validatedFields).every(field => field.valid);
+    }
+  
+    return { formValid, allFieldsValidated };
+  };
 }
