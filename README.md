@@ -10,9 +10,12 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 [![Coverage][codecov-image]][codecov-url]
 
 
-<div style="text-align: center">
-  <img src="./imgs/smart-form-validator-demo.gif" alt="smart-form-validation-in-action">
-</div>
+
+## Basic demo
+
+<img src="./imgs/smart-form-validator-demo.gif" alt="smart-form-validation-in-action">
+
+<hr />
 
 
 ## Installation
