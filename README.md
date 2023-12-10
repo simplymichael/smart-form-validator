@@ -1,5 +1,5 @@
 # Smart Form Validator
-A "somewhat" declarative approach to HTML form fields validation.
+A highly customizable, "somewhat" declarative approach to HTML form fields validation.
 
 [![NPM version][npm-version-image]][npm-url]
 [![Node version][node-version-image]][node-url]
@@ -8,6 +8,9 @@ A "somewhat" declarative approach to HTML form fields validation.
 [![Conventional commits][conventional-commits-image]][conventional-commits-url]
 [![Tests][ci-image]][ci-url]
 [![Coverage][codecov-image]][codecov-url]
+
+
+<img src="./imgs/smart-form-validator-demo.gif" alt="smart-form-validation-in-action">
 
 
 ## Installation
