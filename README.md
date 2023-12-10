@@ -1,6 +1,14 @@
 # Smart Form Validator
 A "somewhat" declarative approach to HTML form fields validation.
 
+[![NPM version][npm-version-image]][npm-url]
+[![Node version][node-version-image]][node-url]
+[![NPM Downloads][npm-downloads-image]][package-url]
+[![License][license-image]][license-url]
+[![Conventional commits][conventional-commits-image]][conventional-commits-url]
+[![Tests][ci-image]][ci-url]
+[![Coverage][codecov-image]][codecov-url]
+
 
 ## Installation
 
@@ -14,7 +22,7 @@ Later in your code:
 
 ```css
 <link 
-  href="https://cdn.jsdelivr.net/npm/smart-form-validator@1.0.0/dist/css/smart-form-validator.min.css" 
+  href="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/css/smart-form-validator.min.css" 
   rel="stylesheet" />
 ```
 
@@ -27,13 +35,13 @@ import SmartFormValidator from "smart-form-validator";
 1. Add CSS file to your page: 
    ```css
     <link 
-      href="https://cdn.jsdelivr.net/npm/smart-form-validator@1.0.0/dist/css/smart-form-validator.min.css" 
+      href="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/css/smart-form-validator.min.css" 
       rel="stylesheet" />
    ```
 2. Add JS file to your page: 
    ```
    <script 
-     src="https://cdn.jsdelivr.net/npm/smart-form-validator@1.0.0/dist/smart-form-validator.min.js"></script>
+     src="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/smart-form-validator.min.js"></script>
    ``` 
 3. `SmartFormValidator` is now available as a property of the global object.
 
@@ -76,7 +84,7 @@ they have entered the expected type of value in the field before they even attem
 for processing. In some cases, we may even limit their ability to submit the form if 
 they have entered incorrect values into one or more of the form fields.
 
-Simple Form Validation inserts a semantic boundary between these ideas by "separating" them into 
+Smart Form Validation inserts a semantic boundary between these ideas by "separating" them into 
 **fields** (receptors of user values), 
 **rules** (constraints on fields),
 **validators** (checks that ensure that a field's value meets the constraints set for that field), and 
@@ -212,13 +220,17 @@ After creating a validator, we must register it with the `addValidator(name, val
 2. A validator should return only `true` or `false` values. 
    A validator should not directly effect a side effect on a field in the event of a 
    successful or failed validation. Any such effects should be delegated to [effects](#effects).
+   
+   Having dedicated effect handlers helps reduce the surface area for surprises 
+   arising from side effects during form validation.
+
    In the end, the validation process is reduced to a binary *passing* or *failing* test.
 
 
 ### Effects
-An Effect represents an action that should be taken based on the result of the validation for a field.
-We can, for example, use an effect to display hints to the user while they enter values into a field, 
-to disable a submit button and prevent the form from being submitted unless every other field has valid input, 
+An Effect represents an action to be taken based on the outcome of a field's validatiion.
+We can, for example, use an effect to display hints to the user as they enter values into a field, 
+to disable the submit button and prevent the form from being submitted unless every other field has valid input, 
 or to add some special CSS effects to a field to indicate its state as either *valid* or *invalid*.
 
 #### Creating effects
@@ -271,3 +283,24 @@ In both cases, `useEffect` expects the complete effect object as its argument.
 - Test a module method: `npm test -- --<module_name>::<method_name>`. 
   Example: `npm test -- --SmartFormValidator::addField`.
 - Run all tests with coverage report: `npm run test:coverage`.
+
+
+
+
+
+
+
+[npm-url]: https://npmjs.com/package/smart-form-validator
+[npm-version-image]: https://img.shields.io/npm/v/smart-form-validator
+[node-url]: https://nodejs.org/
+[node-version-image]: https://img.shields.io/node/v/smart-form-validator
+[package-url]: https://npm.im/smart-form-validator
+[npm-downloads-image]: https://img.shields.io/npm/dm/smart-form-validator
+[license-url]: https://github.com/simplymichael/smart-form-validator/blob/master/LICENSE.md
+[license-image]: https://img.shields.io/github/license/simplymichael/smart-form-validator
+[conventional-commits-url]: https://conventionalcommits.org
+[conventional-commits-image]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-brightgreen.svg
+[ci-url]: https://github.com/simplymichael/smart-form-validator/actions/workflows/run-coverage-tests.yml
+[ci-image]: https://github.com/simplymichael/smart-form-validator/workflows/tests/badge.svg
+[codecov-url]: https://codecov.io/gh/simplymichael/smart-form-validator
+[codecov-image]: https://img.shields.io/codecov/c/github/simplymichael/smart-form-validator?token=IGGXAP7WXO
