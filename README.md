@@ -296,7 +296,7 @@ In both cases, `useEffect` expects the complete effect object as its argument.
 [node-version-image]: https://img.shields.io/node/v/smart-form-validator
 [package-url]: https://npm.im/smart-form-validator
 [npm-downloads-image]: https://img.shields.io/npm/dm/smart-form-validator
-[license-url]: https://github.com/simplymichael/smart-form-validator/blob/master/LICENSE.md
+[license-url]: https://github.com/simplymichael/smart-form-validator/blob/main/LICENSE.md
 [license-image]: https://img.shields.io/github/license/simplymichael/smart-form-validator
 [conventional-commits-url]: https://conventionalcommits.org
 [conventional-commits-image]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-brightgreen.svg
