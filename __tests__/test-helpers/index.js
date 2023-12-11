@@ -58,6 +58,7 @@ function wrapWithDOMFunctionality(obj) {
   const newObj = Object.create({ classes: [] });
   const syntheticProperties = { 
     setAttribute: (k, v) => this[k] = v, 
+    removeAttribute: (key) => delete this[key],
     classList: {
       add: (className) => newObj.classes.push(className),
       remove: (className) => newObj.classes = newObj.classes.filter(c => c !== className)

@@ -44,6 +44,6 @@ function canSubmitForm(validationPassed, input) {
       submitBtn.classList.add(DISABLED_FIELD_CLASSNAME);
     }
   } catch(e) {
-    console.log("Unable to modify the submit button state: ", e);
+    console.log("Unable to modify the submit button state: ", e.message);
   }
 }
