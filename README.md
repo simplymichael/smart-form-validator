@@ -12,7 +12,7 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 
 
 ## 
-<img src="./imgs/smart-form-validator-demo-6.gif" alt="smart-form-validator Demo Sign-up Form" />
+<img src="./imgs/smart-form-validator-demo-7.gif" alt="smart-form-validator Demo Sign-up Form" />
 
 
 ## Installation
