@@ -12,9 +12,7 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 
 
 ## 
-<div style="text-align: center; width: 100%">
-  <img src="./imgs/smart-form-validator-demo-4.gif" alt="smart-form-validation-in-action" class="demo-img" />
-</div>
+<img src="./imgs/smart-form-validator-demo-6.gif" alt="smart-form-validator Demo Sign-up Form" />
 
 
 ## Installation
@@ -22,7 +20,7 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 ### NPM
 
 ```bash
-npm install smart-form-validator.js --save
+npm install smart-form-validator --save
 ```
 
 Later in your code: 
