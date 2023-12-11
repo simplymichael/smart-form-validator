@@ -11,11 +11,9 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 
 
 
-## Basic demo
-
-<img src="./imgs/smart-form-validator-demo.gif" alt="smart-form-validation-in-action">
-
-<hr />
+## 
+<style type="text/css">p[dir="auto"]:has(.demo-img) { text-align: center; }</style>
+<img src="./imgs/smart-form-validator-demo-4.gif" alt="smart-form-validation-in-action" class="demo-img" />
 
 
 ## Installation
