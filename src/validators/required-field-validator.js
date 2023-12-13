@@ -8,7 +8,7 @@
  * @returns {Boolean}
  */
 module.exports = function requiredFieldValidator(value, rule, _, extras) {
-  if(!rule.type || !rule.required || !(["ascii", "checkbox", "text", "select"].includes(rule.type))) {
+  if(!rule.required) {
     return true; // bypass this validation if no rule has been specified for it.
   }
 

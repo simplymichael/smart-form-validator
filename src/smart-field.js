@@ -413,12 +413,12 @@ SmartField.prototype.getValue = function getValue() {
   } else if(input.tagName?.toLowerCase() === "select") {
     value = getHtmlSelectElementSelectedOption(input)?.value?.trim();
   } else if(typeof input.value !== "undefined") {
-    value = input.value?.trim();
+    value = input.value;
   } else if(input.isContentEditable && typeof input.textContent !== "undefined") {
     value = input.textContent;
   }
 
-  return value;
+  return ( is.string(value) ? value.trim() : value );
 };
 
 /**
