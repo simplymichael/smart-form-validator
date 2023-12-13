@@ -17,8 +17,8 @@
     "lcov",
     "text-summary"
   ],
-  "branches": 40,
-  "lines": 40,
-  "functions": 40,
-  "statements": 40
+  "branches": 75,
+  "lines": 75,
+  "functions": 75,
+  "statements": 75
 }
