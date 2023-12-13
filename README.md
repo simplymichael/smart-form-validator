@@ -10,7 +10,6 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 [![Coverage][codecov-image]][codecov-url]
 
 
-
 ## 
 <img src="./imgs/smart-form-validator-demo-7.gif" alt="smart-form-validator Demo Sign-up Form" />
 
@@ -23,7 +22,7 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 npm install smart-form-validator --save
 ```
 
-Later in your code: 
+Later in our code: 
 
 ```css
 <link 
@@ -157,6 +156,7 @@ new SmartformValidator()
 ```
 
 **Note:** We can create custom rules and write custom validators that check for and enforce these rule.
+See the the section on [Customizing Smart Form Validator](#customizing-smart-form-validator).
 
 ### Validators
 Validators are rule enforcers. 
@@ -187,9 +187,25 @@ The following validators come built-in corresponding with the built-in rules:
 **Notes:**: 
 - For a rule to be enforced, there must be a validator defined to enforce its constraints.
 - We can create custom validators that make use of the available rules or that define their own rules.
+  See the [Creating custom validators](#creating-custom-validators) section for more.
 
-#### Creating validators
-A validator is just a function that is called to, well, *validate* the data entered into a field
+
+### Effects
+An Effect represents an action to be taken based on the outcome of a field's validatiion.
+We can, for example, use an effect to display hints to the user as they enter values into a field, 
+to disable the submit button and prevent the form from being submitted unless every other field has valid input, 
+or to add some special CSS effects to a field to indicate its state as either *valid* or *invalid*.
+
+
+## Customizing Smart Form Validator
+Smart Form Validator is easy to customize. 
+- We can create custom rules.
+- We can create custom validators for those rules or for any of the default-supported rules.
+- And we can create custom effects to respond to the result of validation.
+
+
+### Creating custom validators
+A validator is a function that is called to, well, *validate* the data entered into a field.
 The validator function is passed the following positional arguments in order: 
 1. **`value`:** the data entered by the user into the field. 
 2. **`rule`:** an object containing the rules specified for that field.
@@ -203,7 +219,7 @@ The validator function is passed the following positional arguments in order:
 
 A validator should return `true` if the field passed the validation rules. Otherwise it should return `false`.
 
-#### Registering validators 
+### Registering validators 
 After creating a validator, we must register it with the `addValidator(name, validator, meta)` method.
 `addValidator` takes three arguments:
 - **`name` {String} (required):** an arbitrary string that serves as a unique name for the validator.
@@ -231,14 +247,7 @@ After creating a validator, we must register it with the `addValidator(name, val
 
    In the end, the validation process is reduced to a binary *passing* or *failing* test.
 
-
-### Effects
-An Effect represents an action to be taken based on the outcome of a field's validatiion.
-We can, for example, use an effect to display hints to the user as they enter values into a field, 
-to disable the submit button and prevent the form from being submitted unless every other field has valid input, 
-or to add some special CSS effects to a field to indicate its state as either *valid* or *invalid*.
-
-#### Creating effects
+### Creating custom effects
 Every effect is a plain JavaScript object with the following required properties: 
 - **`name` {String}:** the effect name is an arbitrary string used to uniquely identify the effect.
 - **`valid`{Function}:** a function to be invoked to handle the case when the field passed validation.
@@ -255,7 +264,7 @@ An effect object may also contain the following optional properties:
   This property expects a string value that is used in conjunction with the effect `name` property
   to create a unique name for the effect.
 
-#### Registering effects 
+### Registering effects 
 After creating an effect, we must register it for it to be applied during form validation. 
 An effect can be registered "globally" or "locally".
 
@@ -274,6 +283,91 @@ instance.useEffect(effect);
 ```
 
 In both cases, `useEffect` expects the complete effect object as its argument.
+
+
+#### Customizing Smart Form Validator - A quick example 
+Say we have a field 
+and we want to define and enforce a constraint on that field to only accept objects.
+First, we'd create a rule stating that requirement. 
+The rule will have a `field` property that specifies the target field. 
+We can omit this property while creating the rule, but must specify it when adding the rule to the field.
+It may optionally have a `getValue` property if the field is not a traditional HTML input field 
+whose value we can obtain with `element.value`. The `getValue` property 
+will hold a function that will return the current value of the field when called:
+
+```js
+const objectExpectedRule = { 
+  type: "object", 
+  getValue: () => { /* get the field's value somehow*/ } 
+};
+```
+
+Next, we need to add the rule to the field: 
+
+```js
+const fieldId = "someArbitraryIdentifier";
+const validator = new SmartFormValidator();
+
+// register the field on the validator, specifying the rule, 
+// this can be done in several ways: 
+
+// 1. 
+validator.addField(fieldId, objectExpectedRule); // specify field and rule in one line 
+
+// Or ...
+// 2.  
+// validator.addField(fieldId); // register the field 
+// validator.addRule({ ...objectExpectedRule, field: fieldId }); // add the rule to the field.
+
+// Or, if the field is part of a form
+// 3. 
+// validator.addForm(form)
+//    .addField(fieldId, objectExpectedRule);
+```
+
+Next, we'll create a custom validator to check that the field complies with this constraint: 
+
+```js
+function objectValidator(value, rule) {
+  // we are only interested in fields with a type of "object", ignore fields we are not interested in.
+  if(!rule.type || rule.type !== "object") {
+    return true; 
+  }
+
+  // We are assuming `getValue()` returns a string in keeping with the return type of form fields, 
+  // but we can make a call to `JSON.parse()` inside the `getValue()` method 
+  // of the objectExpectedRule, in which case our test will be something like: 
+  // if(!value || typeof value !== "object")
+  if(!value || typeof value !== "string") {
+    return false;
+  }
+  
+  try {
+    const config = JSON.parse(value);
+
+    // Whatever checks go here
+    if(!(prop in config)) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch {
+    return false; // validators should always return Boolean. No `throw` statement here, please.
+  }
+}
+```
+
+Finally, we need to register our validator so it can be invoked during the validation process: 
+```js
+const validatorName = "objectValidator";
+const validatorFunc = objectValidator;
+const validatorMeta = { // optional but recommended
+  namespace: "com.code-stars", 
+  version: 1.0.0  
+}; 
+
+SmartFormValidator.addValidator(validatorName, validatorFunc, validatorMeta);
+```
 
 
 ## Running the [examples](./examples)
