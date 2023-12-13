@@ -8,7 +8,7 @@ input:not([type="submit"]).sfv.sfv-error:-webkit-autofill:focus,
 select.sfv.sfv-error, select.sfv.sfv-error:focus, 
 textarea.sfv.sfv-error, textarea.sfv.sfv-error:focus, 
 .sfv.sfv-error[contenteditable="true"], .sfv.sfv-error[contenteditable="true"]:focus { 
-  background-image: url("./img/error.svg") !important;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjY2MwMDAwIiBoZWlnaHQ9IjIwcHgiIHdpZHRoPSIyMHB4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiAKCSB2aWV3Qm94PSIwIDAgNTEuOTc2IDUxLjk3NiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnPgoJPHBhdGggZD0iTTQ0LjM3Myw3LjYwM2MtMTAuMTM3LTEwLjEzNy0yNi42MzItMTAuMTM4LTM2Ljc3LDBjLTEwLjEzOCwxMC4xMzgtMTAuMTM3LDI2LjYzMiwwLDM2Ljc3czI2LjYzMiwxMC4xMzgsMzYuNzcsMAoJCUM1NC41MSwzNC4yMzUsNTQuNTEsMTcuNzQsNDQuMzczLDcuNjAzeiBNMzYuMjQxLDM2LjI0MWMtMC43ODEsMC43ODEtMi4wNDcsMC43ODEtMi44MjgsMGwtNy40MjUtNy40MjVsLTcuNzc4LDcuNzc4CgkJYy0wLjc4MSwwLjc4MS0yLjA0NywwLjc4MS0yLjgyOCwwYy0wLjc4MS0wLjc4MS0wLjc4MS0yLjA0NywwLTIuODI4bDcuNzc4LTcuNzc4bC03LjQyNS03LjQyNWMtMC43ODEtMC43ODEtMC43ODEtMi4wNDgsMC0yLjgyOAoJCWMwLjc4MS0wLjc4MSwyLjA0Ny0wLjc4MSwyLjgyOCwwbDcuNDI1LDcuNDI1bDcuMDcxLTcuMDcxYzAuNzgxLTAuNzgxLDIuMDQ3LTAuNzgxLDIuODI4LDBjMC43ODEsMC43ODEsMC43ODEsMi4wNDcsMCwyLjgyOAoJCWwtNy4wNzEsNy4wNzFsNy40MjUsNy40MjVDMzcuMDIyLDM0LjE5NCwzNy4wMjIsMzUuNDYsMzYuMjQxLDM2LjI0MXoiLz4KPC9nPgo8L3N2Zz4=") !important;
   background-repeat: no-repeat !important;
   background-position: 95% 50% !important;
   background-size: 15px !important;
@@ -22,7 +22,7 @@ input:not([type="submit"]).sfv.sfv-ok:-webkit-autofill,
 input:not([type="submit"]).sfv.sfv-ok:-webkit-autofill:focus,
 select.sfv.sfv-ok, select.sfv.sfv-ok:focus, textarea.sfv.sfv-ok, textarea.sfv.sfv-ok:focus,
 .sfv.sfv-ok[contenteditable="true"], .sfv.sfv-ok[contenteditable="true"]:focus {
-  background-image: url("./img/check-mark.svg") !important;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgYXJpYS1oaWRkZW49InRydWUiPjxnIGZpbGw9IiMwMDk5MDAiPjxwYXRoIGQ9Ik0xMiAxLjc1QzYuMzQgMS43NSAxLjc1IDYuMzQgMS43NSAxMlM2LjM0IDIyLjI1IDEyIDIyLjI1IDIyLjI1IDE3LjY2IDIyLjI1IDEyIDE3LjY2IDEuNzUgMTIgMS43NXptLS44MSAxNC42OGwtNC4xLTMuMjcgMS4yNS0xLjU3IDIuNDcgMS45OCAzLjk3LTUuNDcgMS42MiAxLjE4LTUuMjEgNy4xNXoiPjwvcGF0aD48L2c+PC9zdmc+") !important;
   background-repeat: no-repeat !important;
   background-position: 95% 50% !important;
   background-size: 15px !important;
