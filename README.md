@@ -66,17 +66,19 @@ import SmartFormValidator from "smart-form-validator";
 ```
 
 ```js
-// signup-form-validator.js
+// File: signup-form-validator.js
+
 const form = document.getElementById("test-form");
 
 new SmartFormValidator()
   .addForm(form)
   .addRule({ field: "name-field", type: "ascii" }) // acccepts only ASCII chars including whitespace
   .addRule({ field: "email-field", type: "email" }) // accepts only valid emails (format, not function)
-  .watch(); // watch the input fields for changes and enforce the specified constraints
+  .watch(); // watch the input fields for changes, ensuring that they adhere to the specified constraints
 ```
 
 
+## 
 The idea behind *Smart Form Validation* is simple. 
 A form has input fields; Each field has conditions and constraints that data entered into it must 
 satisfy to be considered valid. When a field receives input from a user, 
@@ -88,67 +90,77 @@ they have entered the expected type of value in the field before they even attem
 for processing. In some cases, we may even limit their ability to submit the form if 
 they have entered incorrect values into one or more of the form fields.
 
-Smart Form Validation inserts a semantic boundary between these ideas by "separating" them into 
+*Smart Form Validation* inserts a semantic boundary between these ideas by "separating" them into 
 **fields** (receptors of user values), 
 **rules** (constraints on fields),
-**validators** (checks that ensure that a field's value meets the constraints set for that field), and 
-**effects** (state changes (usually visual) on a form field 
-that give the user instant feedback regarding the data they have entered in the field).
+**validators** (checks that ensure that a field's value adheres to the constraints placed on that field), and 
+**effects** (state changes on a form field 
+that give the user (instant) feedback regarding the value they have entered into the field).
 
 
 ## Concepts (summary)
-- **Fields:** Fields are HTML input elements. They represent the elements we want to validate.
-- **Rules:** Rules specify constraints on fields. They specify conditions that fields must pass to be valid.
-- **Validators:** Validators check that data entered into fields 
-  comply with the constraints specified for those fields. 
-- **Effects:** Effects are actions that specify state changes on fiedls based on the results of validation.
+1. **Fields:** Fields are elements that can receive user input. They represent the objects we want to validate.
+2. **Rules:** Rules specify constraints on fields. 
+   They state the conditions that field values must fulfill to be valid.
+3. **Validators:** Validators check that data entered into fields 
+   comply with the rules specified for those fields. 
+4. **Effects:** Effects are actions that perform state changes on fiedls based on the results of validation.
 
 
 ## Concepts (details)
-### Fields 
+### 1. Fields 
 A field is a receptor of user data and is the subject of validation. A field can be any HTML element type
 such as `input`, `checkbox`, `textarea`, `select`, and `contenteditable` elements.
-A field must have an `id` property. A field can optionally also have a `role` and a `getValue` properties.
+A field must have an `id` property. A field may optionally have a `role` and a `getValue` properties.
 
-A `role` attribute with the value of `submit-button` is required 
-if we have a `button` or `input` whose `type` is not `submit`
-but we want effects that handle submit buttons to have access to the button.
+If we have a `button` or `input` whose `type` is not `submit`
+but on which we want effects that handle submit buttons to have access, 
+a `role` attribute with the value of `submit-button` is required for that field. 
 
-The `getValue` property must be a function. This function is used to get the current value of the field 
-if the field is not one of `input`, `checkbox`, `textarea`, `select`, and a `contenteditable` field.
+The `getValue` property, if provided, must be a function. 
+This function is used to get the current value of the field 
+if the field is not a `contenteditable` field and is not one of `input`, `checkbox`, `textarea`, `select`.
 
 The state of a field changes in response to the data entered 
 and its adherence to the constraints or rules defined for/placed on that field.
 
-### Rules
-A rule is an object that specifies the constraint on a field.
-For any field to be validated, we must attach at least one rule to it.
+### 2. Rules
+A rule is an object that specifies the constraint(s) on a field.
+For any field to be validated, we must attach a rule with at least one constraint to it.
 
 Rules are plain JavaScript objects with one required property: `field`.
-The value of the `field` can be either the element's `id` or the element itself  
-if we previously have obtained a reference to the element.
+The value of the `field` can be either the element's `id` or, 
+in cases where we have previously obtained a reference to the element, the element reference.
 
-Other properties of a rule are dependent on the type of the field and the constraints we want placed on that field. 
+Other properties of a rule specify the constraints we want placed on the target field. 
 
-#### Default supported rules
+#### Default supported constraints
 The current default supported rules are: 
 - **`type` {String}:** specifies the acceptable data type of the value for this field, 
   one of either (`"alnum"`|`"alpha"`|`"ascii"`|`"email"`|`"number"`). Default is `alnum`.
-- **`required` {Boolean}:** specifies whether the field is required (true) or not (false).
+- **`required` {Boolean}:** specifies whether the field is required (`true`) or not (`false`).
 - **`length` {Number|Object}:** specifies the accepted (minimum or maximum or both) input length. 
   If the value is a number, it specifies the maximum length.
   If the value is an object, it specifies. the minimum and/or maximum length: 
     - **`length.min` {Number}:** specifies the mininum input length.
     - **`length.max` {Number}:** specifies the maximum input length.
 - **`matchCase` {Boolean}:** performs a case-sensitive (true) or case-insensitive (false) validation.
-- **`allowWhitespace` {Boolean}:** specifies whether to allow whitespace in the value or not.
-- **`regex` {Object|String}:** specifies a custom validation regex. This can be a regex string or regex object.
+- **`allowWhitespace` {Boolean}:** specifies whether the field allows whitespace values or not.
+- **`regex` {Object|String}:** specifies a custom validation regex. 
+  This can be a regex string or regex object.
 
 To specify that a field accepts only numbers that are between 3 to 7 characters, for example, 
-we'd use a rule like this: 
+we'd create a rule with the following constraints: 
 
 ```js
-const rule = { field: someFieldOrItsId, type: "number", length: { min: 3, max: 7 } };
+const rule = { 
+  field: someFieldRefOrItsId, 
+  type: "number", 
+  length: { 
+    min: 3, 
+    max: 7 
+  } 
+};
 
 new SmartformValidator()
   .addForm(form)
@@ -156,11 +168,11 @@ new SmartformValidator()
 ```
 
 **Note:** We can create custom rules and write custom validators that check for and enforce these rule.
-See the the section on [Customizing Smart Form Validator](#customizing-smart-form-validator).
+See the the section on [Customizing Smart Form Validator](#customizing-smart-form-validator) for more.
 
-### Validators
+### 3. Validators
 Validators are rule enforcers. 
-A validator is a function that checks that the value entered into a field 
+A validator is a function that checks that the data entered into a field 
 complies with the constraints placed on that field. 
 
 ### Default validators
@@ -172,7 +184,7 @@ The following validators come built-in corresponding with the built-in rules:
   underscores (`_`), and dashes (`-`).
   The field can also accept whitespace characters with the `allowWhitespace` rule set to true.
   To perform a case-insensitive check, set the `matchCase` rule to `false`.
-- **`asciiTextValidator`:** checks that a field contains only characters from the ASCII character-set. 
+- **`asciiTextValidator`:** checks that a field contains only characters from the [ASCII character-set][ascii]. 
   This validator accepts whitespace characters by default irrespective of the value of the `allowWhitespace` rule. 
   However, we can specify a case-insensitive match by setting the `matchCase` rule to `false`.
 - **`emailValidator`:** checks that the value entered into the field has a valid email form.
@@ -180,49 +192,60 @@ The following validators come built-in corresponding with the built-in rules:
   and/or maximum specified length.
 - **`numberValidator`:** checks that a field contains only the numbers `0 - 9`.
   The field can also accept whitespace characters with the `allowWhitespace` rule set to true.
-- **`regexValidator`:** lets us specify a custom regex for validating the field.
-- **`requiredFieldValidator`:** takes a boolean value 
-  indicating whether the field is required (`true`) or not (`false`).
+- **`regexValidator`:** checks that a field's value conforms to a custom regex constraint.
+- **`requiredFieldValidator`:** checks that a field is not empty, and has some data entered into it.
 
 **Notes:**: 
-- For a rule to be enforced, there must be a validator defined to enforce its constraints.
+- For a constraint to be enforced, there must be a corresponding validator defined to check for it.
 - We can create custom validators that make use of the available rules or that define their own rules.
-  See the [Creating custom validators](#creating-custom-validators) section for more.
+  See the [Creating custom validators](#creating-custom-validators) section for more on how to do this.
 
 
-### Effects
+### 4. Effects
 An Effect represents an action to be taken based on the outcome of a field's validatiion.
-We can, for example, use an effect to display hints to the user as they enter values into a field, 
+We can, for example, use an effect to display hints to the user as they input data into a field, 
 to disable the submit button and prevent the form from being submitted unless every other field has valid input, 
 or to add some special CSS effects to a field to indicate its state as either *valid* or *invalid*.
 
+Having dedicated effect handlers helps reduce the surface area for surprises 
+arising from side-effects during form validation.
+
+**Note:** As with rules and validators, we can create and register custom effects that can be applied 
+for when a field is either valid or invalid. The section on [Creating custom effects](#creating-custom-effects)
+goes into details on how to do this.
+
 
 ## Customizing Smart Form Validator
-Smart Form Validator is easy to customize. 
-- We can create custom rules.
-- We can create custom validators for those rules or for any of the default-supported rules.
-- And we can create custom effects to respond to the result of validation.
+Smart Form Validator is easy to customize. To customize Smart Form Validator, we just need to, as already stated: 
+- (optionally) create custom constraints.
+- create custom validators for to check for custom constraints created by us or other third-parties, 
+  or for any of the default-supported constraints.
+- (optionally) create custom effects to respond to the result of validation 
+  from either our own custom validator(s) or the default validators.
 
 
 ### Creating custom validators
-A validator is a function that is called to, well, *validate* the data entered into a field.
+A validator is a function that is called to, well... *validate* the data entered into a field.
 The validator function is passed the following positional arguments in order: 
 1. **`value`:** the data entered by the user into the field. 
-2. **`rule`:** an object containing the rules specified for that field.
-   The validator checks that the `value` adheres to the rules.
+2. **`rule`:** an object containing the constraints specified for that field.
+   The validator checks that the `value` adheres to the rule.
 3. **`prevResult`:** a boolean value that tells the current validator the 
    result of the previous validator in the chain of validators attached to this field.
-4. **`extras`:** an object containing any extra information. For example, 
-   a checkbox can have the value `on` or `off` and a `checked` state that can be either `true` or `false`.
-   The value (`on` or `off`) will be passed as the first argument to the validator.
+4. **`extras`:** an object containing any extra information.  
+   A checkbox, for example, can have the value `on` or `off` 
+   and a `checked` state that can be either `true` or `false`.
+   The value (`on` or `off`) will be passed as the first argument (the `value` argument) to the validator.
    The `checked` state will be passed in as `extras.checked`.
 
-A validator should return `true` if the field passed the validation rules. Otherwise it should return `false`.
+A validator should return `true` if the field passed the validation rule. Otherwise it should return `false`.
 
 ### Registering validators 
-After creating a validator, we must register it with the `addValidator(name, validator, meta)` method.
+After creating a validator, we must register it with the `addValidator(name, validator, meta)` method
+of the `SmartFormValidator` instance.
+
 `addValidator` takes three arguments:
-- **`name` {String} (required):** an arbitrary string that serves as a unique name for the validator.
+- **`name` {String} (required):** an arbitrary string that can serve as a unique name for the validator.
 - **`validator` {Function} (required):** the validator function itself.
 - **`meta` {Object} (optional):** an object that holds meta information about the validator. 
   To prevent naming conflict with other validators, we can have a `meta.namespace` property.
@@ -236,31 +259,29 @@ After creating a validator, we must register it with the `addValidator(name, val
    For example, instead of having a validator that checks for a `required` state, 
    a maximum length constraint, and whether or not the fields contains numbers, 
    it's better to have separate validators for each of these checks: 
-   one to check for `required`, another to enforce the `length` constraint, and yet another to check for numbers.
+   one to check for `required`, another to enforce the `length` constraint, 
+   and yet another to check that the `number` constraint is fulfilled.
    Each of these validators will be called with the rule and the result of the previous validator.
 2. A validator should return only `true` or `false` values. 
-   A validator should not directly effect a side effect on a field in the event of a 
+   A validator should not directly effect a side-effect on a field in the event of a 
    successful or failed validation. Any such effects should be delegated to [effects](#effects).
-   
-   Having dedicated effect handlers helps reduce the surface area for surprises 
-   arising from side effects during form validation.
 
    In the end, the validation process is reduced to a binary *passing* or *failing* test.
 
 ### Creating custom effects
 Every effect is a plain JavaScript object with the following required properties: 
 - **`name` {String}:** the effect name is an arbitrary string used to uniquely identify the effect.
-- **`valid`{Function}:** a function to be invoked to handle the case when the field passed validation.
+- **`valid`{Function}:** a function to be invoked to handle the case when the field passes validation.
   The function is passed the field as the first argument.
-- **`invalid` {Function}:** a function to be called to handle the case when the field failed validation.
+- **`invalid` {Function}:** a function to be called to handle the case when the field fails validation.
   The function is passed the field as the first argument.
 
 An effect object may also contain the following optional properties: 
 - **`init` {Function}:** an initialization function that is called 
-  to perform any initialization tasks for the effect. This function is called once when the effect is registered.
+  to perform any initialization tasks for the effect. 
+  This function is called once when the effect is [registered](#registering-effects).
 - **`meta` {Object}:** an object that holds meta information (such as author, version, etc) about the effect. 
-  An important and recommended property is `effect.namespace` 
-  that helps to prevent naming conflict with other effects.
+  A recommended property is `meta.namespace` that helps to prevent naming conflict with other effects.
   This property expects a string value that is used in conjunction with the effect `name` property
   to create a unique name for the effect.
 
@@ -272,14 +293,14 @@ Registering an effect "globally" makes the effect available to all instances of 
 Just call `useEffect(effect)` statically on the `SmartFormValidator` class like so: 
 `SmartFormValidator.useEffect(effect)`.
  
-Registering an effect "locally" means the effect is only available to fields within the 
-current `SmartFormValidator` instance. To do a "local" effect registration, 
+Registering an effect "locally" means the effect is only available to fields managed by the 
+`SmartFormValidator` instance on which `useEffect` is called. To do a "local" effect registration, 
 call the `useEffect(effect)` method on an instance. For example: 
 
 ```js
-const instance = new SmartFormValidator();
+const validator = new SmartFormValidator();
 
-instance.useEffect(effect);
+validator.useEffect(effect);
 ```
 
 In both cases, `useEffect` expects the complete effect object as its argument.
@@ -290,8 +311,8 @@ Say we have a field
 and we want to define and enforce a constraint on that field to only accept objects.
 First, we'd create a rule stating that requirement. 
 The rule will have a `field` property that specifies the target field. 
-We can omit this property while creating the rule, but must specify it when adding the rule to the field.
-It may optionally have a `getValue` property if the field is not a traditional HTML input field 
+We may omit this property while creating the rule, but must specify it when adding the rule to the field.
+The rule may optionally have a `getValue` property if the field is not a traditional HTML input field 
 whose value we can obtain with `element.value`. The `getValue` property 
 will hold a function that will return the current value of the field when called:
 
@@ -309,7 +330,9 @@ const fieldId = "someArbitraryIdentifier";
 const validator = new SmartFormValidator();
 
 // register the field on the validator, specifying the rule, 
-// this can be done in several ways: 
+// this can be done in several ways 
+// (the first two are useful if the field is a stand-alone field, 
+// the last is useful when the field is part of a form): 
 
 // 1. 
 validator.addField(fieldId, objectExpectedRule); // specify field and rule in one line 
@@ -331,12 +354,13 @@ Next, we'll create a custom validator to check that the field complies with this
 function objectValidator(value, rule) {
   // we are only interested in fields with a type of "object", ignore fields we are not interested in.
   if(!rule.type || rule.type !== "object") {
+    // we have to return `true` so the next validator does not think the field failed validation
     return true; 
   }
 
-  // We are assuming `getValue()` returns a string in keeping with the return type of form fields, 
+  // We are assuming `getValue()` returns a string in keeping with the value type of form fields, 
   // but we can make a call to `JSON.parse()` inside the `getValue()` method 
-  // of the objectExpectedRule, in which case our test will be something like: 
+  // of the `objectExpectedRule`, in which case our test will be something like: 
   // if(!value || typeof value !== "object")
   if(!value || typeof value !== "string") {
     return false;
@@ -345,15 +369,15 @@ function objectValidator(value, rule) {
   try {
     const config = JSON.parse(value);
 
-    // Whatever checks go here
+    // `config` property checks go here, for example:
     if(!(prop in config)) {
       return false;
-    } else {
-      return true;
     }
   } catch {
-    return false; // validators should always return Boolean. No `throw` statement here, please.
+    return false; // validators should always return Boolean values. No `throw` statement here, please.
   }
+
+  return true;
 }
 ```
 
@@ -362,11 +386,11 @@ Finally, we need to register our validator so it can be invoked during the valid
 const validatorName = "objectValidator";
 const validatorFunc = objectValidator;
 const validatorMeta = { // optional but recommended
-  namespace: "com.code-stars", 
+  namespace: "some-namespace", 
   version: 1.0.0  
 }; 
 
-SmartFormValidator.addValidator(validatorName, validatorFunc, validatorMeta);
+validator.addValidator(validatorName, validatorFunc, validatorMeta);
 ```
 
 
@@ -403,3 +427,5 @@ SmartFormValidator.addValidator(validatorName, validatorFunc, validatorMeta);
 [ci-image]: https://github.com/simplymichael/smart-form-validator/workflows/tests/badge.svg
 [codecov-url]: https://codecov.io/gh/simplymichael/smart-form-validator
 [codecov-image]: https://img.shields.io/codecov/c/github/simplymichael/smart-form-validator?token=IGGXAP7WXO
+
+[ascii]: https://en.wikipedia.org/wiki/ASCII
