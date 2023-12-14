@@ -1,16 +1,33 @@
 {
   "name": "smart-form-validator",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+  "version": "0.1.0-alpha",
+  "description": "A highly customizable, \"somewhat\" declarative form validator.",
+  "main": "dist/esm/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "prebuild": "npm run lint && npm run test:coverage",
+    "build": "shx rm -rf dist && npm run build:js && npm run build:css",
+    "build:dev": "shx rm -rf dist && npm run build:css && npm run build:js:dev",
+    "build:css": "shx mkdir -p ./dist/css && shx cat ./src/effects/**/*.css | postcss > ./dist/css/smart-form-validator.min.css",
+    "build:js": "cross-env NODE_ENV=production rollup -c",
+    "build:js:dev": "cross-env NODE_ENV=development rollup -c -w",
     "commit": "git-cz",
+    "examples": "http-server -c-1",
     "lint": "npx eslint src/**/*.js __tests__/**/*.js",
     "lint:fix": "npm run lint -- --fix",
     "test": "cross-env NODE_ENV=test mocha __tests__/tests.js",
     "test:coverage": "nyc npm test"
   },
-  "keywords": [],
+  "keywords": [
+    "validation",
+    "form validation",
+    "html validation",
+    "email validation", 
+    "input validation"
+  ],
   "author": "simplymichael <simplymichaelorji@gmail.com> (https://github.com/simplymichael)",
   "license": "MIT",
   "repository": {
@@ -22,16 +39,29 @@
   },
   "homepage": "https://github.com/simplymichael/smart-form-validator#readme",
   "devDependencies": {
+    "@babel/cli": "7.23.4",
+    "@babel/core": "7.23.3",
+    "@babel/preset-env": "7.23.3",
+    "@rollup/plugin-babel": "6.0.4",
+    "@rollup/plugin-commonjs": "25.0.7",
+    "@rollup/plugin-node-resolve": "15.2.3",
     "chai": "4.3.10",
     "chai-dom": "1.12.0",
     "commitizen": "4.3.0",
     "cross-env": "7.0.3",
+    "cssnano": "6.0.1",
+    "cz-conventional-changelog": "3.3.0",
     "eslint": "8.53.0",
     "ghooks": "2.0.4",
+    "http-server": "14.1.1",
     "jsdom": "22.1.0",
     "jsdom-global": "3.0.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
+    "postcss-cli": "10.1.0",
+    "rollup": "2.79.1",
+    "rollup-plugin-terser": "7.0.2",
+    "shx": "0.3.4",
     "sinon": "17.0.1",
     "sinon-chai": "3.7.0"
   },
@@ -42,5 +72,9 @@
     "ghooks": {
       "pre-commit": "npm run lint && npm run test:coverage"
     }
+  }, 
+  "engines": {
+    "node": ">=16.15.1",
+    "npm": ">=8.12.1"
   }
 }
