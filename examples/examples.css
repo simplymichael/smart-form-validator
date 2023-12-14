@@ -1,0 +1,44 @@
+form { text-align: center; }
+div { margin-bottom: 10px; }
+form p.descriptor {
+  display: inline-block; 
+  width: 250px;
+  margin-bottom: 5px;
+}
+input:not([type="checkbox"]),  input:not([type="checkbox"]):focus { 
+  height: 35px;
+  width: 250px;
+  border: thin solid #ccc !important;
+  margin-right: 5px;
+  padding-left: 8px; 
+
+  /*-moz-box-shadow: inset 0 0 4px rgba(0,0,0,0.2); 
+  -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2); 
+  box-shadow: inner 0 0 4px rgba(0, 0, 0, 0.2);*/
+  -webkit-border-radius: 3px; 
+  -moz-border-radius: 3px; 
+  border-radius: 3px;
+}
+input:not([type="checkbox"]):focus { 
+  outline: none; 
+  border-color: #719ECE;
+  box-shadow: 0 0 10px #719ECE;
+}
+input[type="submit"], *[role="submit-button"] {
+  height: 35px;
+  width: 300px;
+  background-color: #067dfc;
+  border-radius: 5px;
+  border-color: #719ECE;
+  color: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="submit"]:disabled, *[role="submit-button"]:disabled {
+  background-color: ghostwhite;
+  border-color: #ccc;
+  border: none !important;
+  color: #222;
+  box-shadow: none;
+}

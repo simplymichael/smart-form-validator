@@ -1,0 +1,123 @@
+<Doctype html>
+
+    <html>
+      <head>
+        <title>Smart Form Validator - Browser Examples</title>
+        <link rel="stylesheet" href="../../dist/css/smart-form-validator.min.css" />
+        <link rel="stylesheet" href="../examples.css" />
+        <script type="text/javascript" src="../../dist/smart-form-validator.js"></script>
+      </head>
+      <body>
+        <ul>
+          <li><a href="../">Back</a></li>
+        </ul>
+
+        <h3>Stand-alone input elements</h3>
+        <div>
+          <input id="firstname-field" type="text" autocomplete="off" role="presentation" placeholder="Enter your Firstname" />
+          <input id="accept-terms-field" type="checkbox" /> Accept terms
+        </div>
+
+        <input id="submit-button" type="submit" value="Submit Form" />
+    
+        <script type="text/javascript">
+          const firstnameField = document.getElementById("firstname-field");
+          const acceptTermsField = document.getElementById("accept-terms-field");
+          const firstnameRule = { length: { min: 3, max: 5 } };
+          const acceptTermsRule = { type: "checkbox", required: true };
+          const submitButton = document.getElementById("submit-button");
+          const formValidator = new SmartFormValidator();
+    
+          formValidator.addField(firstnameField, firstnameRule);
+          formValidator.addField(acceptTermsField, acceptTermsRule);
+          formValidator.addField(submitButton);
+          formValidator.watch();
+        </script>
+
+        <p>&nbsp;</p>
+ 
+        <h3>Code</h3>
+        <code>
+          &lt;head&gt; <br />
+            &nbsp;&nbsp;&lt;link <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;href="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/css/smart-form-validator.min.css" <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;rel="stylesheet" /&gt; <br />
+
+            &nbsp;&nbsp;&lt;script src="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/smart-form-validator.min.js"&gt;&lt;/script&gt; <br />
+          &lt;/head&gt; <br /><br />
+          ...
+          <br /><br />
+          &lt;input id="firstname-field" type="text" /&gt; <br />
+          &lt;input id="accept-terms-field" type="checkbox" /&gt; Accept terms <br />
+          &lt;input id="submit-button" type="submit" value="Submit Form" /&gt; <br /><br />
+
+          &lt;script type="text/javascript"&gt; <br />
+            const firstnameField = document.getElementById("firstname-field"); <br />
+            const acceptTermsField = document.getElementById("accept-terms-field"); <br />
+            const firstnameRule = { length: { min: 3, max: 5 } }; <br />
+            const acceptTermsRule = { type: "checkbox", required: true }; <br />
+            const submitButton = document.getElementById("submit-button"); <br />
+            const formValidator = new SmartFormValidator(); <br /><br />
+      
+            formValidator.addField(firstnameField, firstnameRule); <br />
+            formValidator.addField(acceptTermsField, acceptTermsRule); <br />
+            formValidator.addField(submitButton); <br />
+            formValidator.watch(); <br />
+            &lt;/script&gt;
+        </code>
+    
+        <br /><br />
+        <hr />
+    
+        <h3>Input elements belonging to an HTML form</h3>
+        <form id="test-form" style="text-align: left;">
+          <input type="text" id="name-field" role="presentation" autocomplete="off" placeholder="Enter your name" />
+          <input type="email" id="email-field" role="presentation" autocomplete="off" placeholder="Enter your email" />
+          <button id="submit-form-button" role="submit-button">Submit Form</button>
+        </form>
+    
+        <script type="text/javascript">
+          const form = document.getElementById("test-form");
+          const name = document.getElementById("name-field");
+          const email = document.getElementById("email-field");
+          
+          // When a form has an `<input type="submit" or 
+          // an element with `role="submit-button",
+          // adding the submit button via `addField()` is optional.
+          new SmartFormValidator()
+            .addForm(form)
+            .addRule({ field: name, length: { min: 3, max: 5 } })
+            .addRule({ field: "email-field", type: "email" })
+            .watch();
+        </script>
+
+        <p>&nbsp;</p>
+
+        <h3>Code</h3>
+        <code>
+          &lt;form id="test-form"&gt; <br />
+            &nbsp;&nbsp;&lt;input type="text" id="name-field" /&gt; <br />
+            &nbsp;&nbsp;&lt;input type="email" id="email-field" /&gt; <br />
+            &nbsp;&nbsp;&lt;button id="submit-form-button" role="submit-button">Submit Form&lt;/button&gt; <br />
+          &lt;/form&gt; <br /><br />
+      
+          &lt;script type="text/javascript"&gt; <br />
+            const form = document.getElementById("test-form"); <br />
+            const name = document.getElementById("name-field"); <br />
+            const email = document.getElementById("email-field"); <br /><br />
+            
+            &sol;&sol; When a form has an `&lt;input type="submit" or <br />
+            &sol;&sol; an element with `role="submit-button", <br />
+            &sol;&sol; adding the submit button via `addField()` is optional. <br />
+            new SmartFormValidator() <br />
+              &nbsp;&nbsp;.addForm(form) <br />
+              &nbsp;&nbsp;.addRule({ field: name, length: { min: 3, max: 5 } }) <br />
+              &nbsp;&nbsp;.addRule({ field: &quot;email-field&quot;, type: &quot;email&quot; }) <br />
+              &nbsp;&nbsp;.watch(); <br />
+          &lt;/script&gt;
+        </code>
+
+        <br /><br /><br />
+
+      </body>
+    </html>

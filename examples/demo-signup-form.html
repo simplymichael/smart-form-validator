@@ -1,0 +1,52 @@
+<Doctype html>
+
+    <html>
+      <head>
+        <title>Smart Form Validator - Browser Examples</title>
+        <link rel="stylesheet" href="../../dist/css/smart-form-validator.min.css" />
+        <link rel="stylesheet" href="./examples.css" />
+        <script type="text/javascript" src="../../dist/smart-form-validator.js"></script>
+      </head>
+      <body>
+        <ul>
+          <li><a href="./">Back</a></li>
+        </ul>
+
+        <form id="signup-form" autocomplete="off">
+            <h3>Demo - Sign up form</h3>
+            <p class="descriptor">length: { min: 3, max: 10 }</p>
+            <p class="descriptor">length: { min: 3, max: 10 }</p>
+           <div>
+            <!-- https://gist.github.com/niksumeiko/360164708c3b326bd1c8?permalink_comment_id=3925346#gistcomment-3925346 -->
+            <input type="text" id="firstname-field" placeholder="Firstname" role="presentation" autocomplete="off" />
+            <input type="text" id="lastname-field" placeholder="Lastname" role="presentation" autocomplete="off" />
+           </div>
+
+
+           <p class="descriptor">type: "email"</p>
+            <p class="descriptor">required: true</p>
+
+           <div>
+             <input type="email" id="email-field" placeholder="username@email-provider.xyz" role="presentation" autocomplete="off" />
+             <input type="password" id="password-field" placeholder="Password" />
+           </div>
+          
+           <div>
+            <input id="accept-terms-field" type="checkbox" /> I agree to site terms
+           </div>
+
+           <button id="submit-form-button" role="submit-button">Sign up</button>
+        </form>
+    
+        <script type="text/javascript">
+          new SmartFormValidator()
+            .addForm("signup-form")
+            .addRule({ field: "firstname-field", length: { min: 3, max: 10 } })
+            .addRule({ field: "lastname-field", length: { min: 3, max: 10 } })
+            .addRule({ field: "password-field", required: true })
+            .addRule({ field: "email-field", type: "email" })
+            .addRule({ field: "accept-terms-field", type: "checkbox", required: true })
+            .watch();
+        </script>
+      </body>
+    </html>
