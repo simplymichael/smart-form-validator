@@ -24,30 +24,27 @@ npm install smart-form-validator --save
 
 Later in our code: 
 
+```js
+import SmartFormValidator from "smart-form-validator";
+```
+
+### Using the `<script>` tag
+
+Add JS file to page: 
+```
+<script 
+  src="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/smart-form-validator.min.js"></script>
+``` 
+`SmartFormValidator` is now available as a property of the global object.
+
+
+### Using default effects styles
+To get the default effects styles applied to our form fields, we need to add the CSS file to our page: 
 ```css
 <link 
   href="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/css/smart-form-validator.min.css" 
   rel="stylesheet" />
 ```
-
-```js
-import SmartFormValidator from "smart-form-validator";
-```
-
-### Using build / minified version
-
-1. Add CSS file to your page: 
-   ```css
-    <link 
-      href="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/css/smart-form-validator.min.css" 
-      rel="stylesheet" />
-   ```
-2. Add JS file to your page: 
-   ```
-   <script 
-     src="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/smart-form-validator.min.js"></script>
-   ``` 
-3. `SmartFormValidator` is now available as a property of the global object.
 
 
 ## Quick start
@@ -67,6 +64,8 @@ import SmartFormValidator from "smart-form-validator";
 
 ```js
 // File: signup-form-validator.js
+
+import SmartFormValidator from "smart-form-validator";
 
 const form = document.getElementById("test-form");
 
@@ -125,16 +124,18 @@ The state of a field changes in response to the data entered
 and its adherence to the constraints or rules defined for/placed on that field.
 
 ### 2. Rules
-A rule is an object that specifies the constraint(s) on a field.
+A rule is an object that specifies the constraint(s) on a field. 
+It encapsulates the constraints we want placed on that field.
 For any field to be validated, we must attach a rule with at least one constraint to it.
 
 Rules are plain JavaScript objects with one required property: `field`.
 The value of the `field` can be either the element's `id` or, 
-in cases where we have previously obtained a reference to the element, the element reference.
+in instances where we have previously obtained a reference to the element, the element reference.
 
-Other properties of a rule specify the constraints we want placed on the target field. 
+Other properties of a rule depend on the type of the field and 
+specify the constraints we want placed on the target field. 
 
-#### Default supported constraints
+#### Default constraints
 The current default supported rules are: 
 - **`type` {String}:** specifies the acceptable data type of the value for this field, 
   one of either (`"alnum"`|`"alpha"`|`"ascii"`|`"email"`|`"number"`). Default is `alnum`.
@@ -167,42 +168,43 @@ new SmartformValidator()
   .addRule(rule)
 ```
 
-**Note:** We can create custom rules and write custom validators that check for and enforce these rule.
+**Note:** We can create custom rules and write custom validators that check for these rules.
 See the the section on [Customizing Smart Form Validator](#customizing-smart-form-validator) for more.
 
 ### 3. Validators
-Validators are rule enforcers. 
+Validators are like rule "enforcers". 
 A validator is a function that checks that the data entered into a field 
 complies with the constraints placed on that field. 
 
 ### Default validators
-The following validators come built-in corresponding with the built-in rules: 
+The following validators come built-in corresponding with the default constraints: 
 - **`alphaValidator`:** checks that a field contains only the letters `A - Z`, underscores (`_`), and dashes (`-`).
-  The field can also accept whitespace characters with the `allowWhitespace` rule set to true.
-  To perform a case-insensitive check, set the `matchCase` rule to `false`.
+  The field can also accept whitespace characters with the `allowWhitespace` constraint set to `true`.
+  To perform a case-insensitive check, set the `matchCase` constraint to `false`.
 - **`alphanumericValidator`:** checks that a field contains only the letters `A - Z`, the numbers `0 - 9`, 
   underscores (`_`), and dashes (`-`).
-  The field can also accept whitespace characters with the `allowWhitespace` rule set to true.
-  To perform a case-insensitive check, set the `matchCase` rule to `false`.
+  The field can also accept whitespace characters with `allowWhitespace` set to true.
+  To perform a case-insensitive check, set `matchCase` to `false`.
 - **`asciiTextValidator`:** checks that a field contains only characters from the [ASCII character-set][ascii]. 
-  This validator accepts whitespace characters by default irrespective of the value of the `allowWhitespace` rule. 
-  However, we can specify a case-insensitive match by setting the `matchCase` rule to `false`.
-- **`emailValidator`:** checks that the value entered into the field has a valid email form.
+  This validator accepts whitespace characters by default irrespective of the value of `allowWhitespace`. 
+  However, we can specify a case-insensitive match by setting `matchCase` to `false`.
+- **`emailValidator`:** checks that the value entered into the field has a valid email format.
 - **`lengthValidator`:** checks that the value entered in the field is between the minimum 
   and/or maximum specified length.
 - **`numberValidator`:** checks that a field contains only the numbers `0 - 9`.
-  The field can also accept whitespace characters with the `allowWhitespace` rule set to true.
-- **`regexValidator`:** checks that a field's value conforms to a custom regex constraint.
-- **`requiredFieldValidator`:** checks that a field is not empty, and has some data entered into it.
+  The field can also accept whitespace characters with `allowWhitespace` set to true.
+- **`regexValidator`:** checks that a field's value conforms to a custom regular expression constraint.
+- **`requiredFieldValidator`:** checks that a field has some data entered into it.
 
-**Notes:**: 
-- For a constraint to be enforced, there must be a corresponding validator defined to check for it.
-- We can create custom validators that make use of the available rules or that define their own rules.
+**Notes**
+- For a constraint to be checked during validation, there must be a corresponding validator defined for it.
+- We can create custom validators that make use of the [default constraints](#default-constraints) 
+  or that define their own rules.
   See the [Creating custom validators](#creating-custom-validators) section for more on how to do this.
 
 
 ### 4. Effects
-An Effect represents an action to be taken based on the outcome of a field's validatiion.
+An Effect represents an action to be taken based on the outcome of a field's validation.
 We can, for example, use an effect to display hints to the user as they input data into a field, 
 to disable the submit button and prevent the form from being submitted unless every other field has valid input, 
 or to add some special CSS effects to a field to indicate its state as either *valid* or *invalid*.
@@ -238,7 +240,8 @@ The validator function is passed the following positional arguments in order:
    The value (`on` or `off`) will be passed as the first argument (the `value` argument) to the validator.
    The `checked` state will be passed in as `extras.checked`.
 
-A validator should return `true` if the field passed the validation rule. Otherwise it should return `false`.
+A validator should return `true` if the field it is validating passed the validation rule. 
+Otherwise it should return `false`.
 
 ### Registering validators 
 After creating a validator, we must register it with the `addValidator(name, validator, meta)` method
@@ -259,11 +262,11 @@ of the `SmartFormValidator` instance.
    For example, instead of having a validator that checks for a `required` state, 
    a maximum length constraint, and whether or not the fields contains numbers, 
    it's better to have separate validators for each of these checks: 
-   one to check for `required`, another to enforce the `length` constraint, 
+   one to check for `required`, another to ensure the `length` constraint is met, 
    and yet another to check that the `number` constraint is fulfilled.
    Each of these validators will be called with the rule and the result of the previous validator.
 2. A validator should return only `true` or `false` values. 
-   A validator should not directly effect a side-effect on a field in the event of a 
+   A validator should not directly perform a side-effect on a field in the event of a 
    successful or failed validation. Any such effects should be delegated to [effects](#effects).
 
    In the end, the validation process is reduced to a binary *passing* or *failing* test.
@@ -308,19 +311,12 @@ In both cases, `useEffect` expects the complete effect object as its argument.
 
 #### Customizing Smart Form Validator - A quick example 
 Say we have a field 
-and we want to define and enforce a constraint on that field to only accept objects.
+and we want to define a constraint on that field so that it only accepts objects (or JSON strings).
 First, we'd create a rule stating that requirement. 
 The rule will have a `field` property that specifies the target field. 
 We may omit this property while creating the rule, but must specify it when adding the rule to the field.
-The rule may optionally have a `getValue` property if the field is not a traditional HTML input field 
-whose value we can obtain with `element.value`. The `getValue` property 
-will hold a function that will return the current value of the field when called:
-
 ```js
-const objectExpectedRule = { 
-  type: "object", 
-  getValue: () => { /* get the field's value somehow*/ } 
-};
+const objectExpectedRule = { type: "object" };
 ```
 
 Next, we need to add the rule to the field: 
@@ -358,9 +354,10 @@ function objectValidator(value, rule) {
     return true; 
   }
 
-  // We are assuming `getValue()` returns a string in keeping with the value type of form fields, 
-  // but we can make a call to `JSON.parse()` inside the `getValue()` method 
-  // of the `objectExpectedRule`, in which case our test will be something like: 
+  // We are assuming the field's value is a string in keeping with the value type of form fields, 
+  // but if we have a `getValue()` method attached to the field, 
+  // we can make a call to `JSON.parse()` inside the `getValue()` method 
+  // in which case our test will be something like: 
   // if(!value || typeof value !== "object")
   if(!value || typeof value !== "string") {
     return false;
@@ -369,7 +366,7 @@ function objectValidator(value, rule) {
   try {
     const config = JSON.parse(value);
 
-    // `config` property checks go here, for example:
+    // `config` property checks go here; For example:
     if(!(prop in config)) {
       return false;
     }
