@@ -108,6 +108,7 @@ that give the user (instant) feedback regarding the value they have entered into
 
 ## Concepts (details)
 ### 1. Fields 
+<a id="fields"></a>
 A field is a receptor of user data and is the subject of validation. A field can be any HTML element type
 such as `input`, `checkbox`, `textarea`, `select`, and `contenteditable` elements.
 A field must have an `id` property. A field may optionally have a `role` and a `getValue` properties.
@@ -124,6 +125,7 @@ The state of a field changes in response to the data entered
 and its adherence to the constraints or rules defined for/placed on that field.
 
 ### 2. Rules
+<a id="rules"></a>
 A rule is an object that specifies the constraint(s) on a field. 
 It encapsulates the constraints we want placed on that field.
 For any field to be validated, we must attach a rule with at least one constraint to it.
@@ -172,6 +174,7 @@ new SmartformValidator()
 See the the section on [Customizing Smart Form Validator](#customizing-smart-form-validator) for more.
 
 ### 3. Validators
+<a id="validators"></a>
 Validators are like rule "enforcers". 
 A validator is a function that checks that the data entered into a field 
 complies with the constraints placed on that field. 
@@ -204,6 +207,7 @@ The following validators come built-in corresponding with the default constraint
 
 
 ### 4. Effects
+<a id="effects"></a>
 An Effect represents an action to be taken based on the outcome of a field's validation.
 We can, for example, use an effect to display hints to the user as they input data into a field, 
 to disable the submit button and prevent the form from being submitted unless every other field has valid input, 
