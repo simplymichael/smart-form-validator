@@ -409,6 +409,21 @@ validator.addValidator(validatorName, validatorFunc, validatorMeta);
 - Run all tests with coverage report: `npm run test:coverage`.
 
 
+## Release process (manual)
+- Checkout main branch: `git checkout main`.
+- Merge latest changes from develop into main branch: `git merge develop`.
+- Bump version number in package.json file.
+- Build: `npm run build`.
+- Commit build and version number bump: 
+  `git commit -m "Build latest version and bump version number from <prev_ver> to <curr_ver>"`.
+- Tag build: `git tag -a vx.x.x -m "<tag summary>"`.
+- Push to github: `git push && git push origin --tags`. 
+- Draft release on GitHub (optional).
+- Publish to NPM: `npm publish`.
+- Checkout develop branch: `git checkout develop`.
+- Merge updates from main branch into develop: `git merge main`.
+
+
 
 
 
