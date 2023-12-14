@@ -2,9 +2,10 @@
  * Validate that a value is not empty, that is, not undefined. 
  * @param {String} value (required): The value to validate
  * @param {Object} rule (required): Object containing the requirements for the value to be valid.
- * @param {String} [rule.type] (required): The type of the expected value (ascii, checkbox, select, text).
  * @param {Boolean} [rule.required]: Dictates whether or not the value is required.
- * @param {Boolean} [rule.checked] (optional): if the value is of a checkbox, .
+ * @param {Boolean} prevResult (optional);
+ * @param {Object} extras
+ * @param {Boolean} [extras.checked] (optional): if the value is of a checkbox, .
  * @returns {Boolean}
  */
 module.exports = function requiredFieldValidator(value, rule, _, extras) {
