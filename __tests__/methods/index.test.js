@@ -86,6 +86,8 @@ function index(it, expect) {
       "addField",
       "addFields",
       "addRule",
+      "addValidator",
+      "getValidators",
       "getEffects",
       "getField",
       "getFields",

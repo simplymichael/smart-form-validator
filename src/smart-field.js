@@ -9,7 +9,9 @@ const {
   object,
   generateEffectName,
   getEffectNames,
+  getValidatorNames,
   preEffectRegistrationCheck,
+  preValidatorRegistrationCheck,
   isSubmitBtn,
   normalizeId,
   validateId,
@@ -18,8 +20,8 @@ const defaultValidators = require("./validators");
 
 const defaultEffects = Object.values(effects);
 const defaultEffectNames = getEffectNames(effects);
-const defaultValidatorEntries = Object.entries(defaultValidators);
-const defaultValidatorKeys = Object.keys(defaultValidators);
+const defaultValidatorFunctions = Object.entries(defaultValidators);
+const defaultValidatorKeys = getValidatorNames(defaultValidators); //Object.keys(defaultValidators);
 
 
 module.exports = SmartField;
@@ -101,7 +103,7 @@ function SmartField(element, rule) {
   this.id = element.id;
   this.element = element;
   this.defaultEffects = new Map();
-  this.defaultValidators = new Map(defaultValidatorEntries);
+  this.defaultValidators = new Map(defaultValidatorFunctions);
   this.effects = new Map();
   this.validators = new Map();
 
@@ -307,50 +309,13 @@ SmartField.prototype.usesEffect = function usesEffect(name, namespace) {
  * @returns this.
  */
 SmartField.prototype.addValidator = function addValidator(validatorKey, validatorFn, validatorMeta) {
-  if(!(is.string(validatorKey))) {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "validatorKey")
-        .replace(":type:", "a string")
-    );
-  }
-
-  let validatorNamespace = "";
-
-  validatorKey = validatorKey.trim();
-
-  if(!validatorKey) {
-    throw new TypeError(errorMessages.functionParamIsRequired.replace(":param:", "validatorKey"));
-  }
-
-  if(is.object(validatorMeta) && is.string(validatorMeta.namespace)) {
-    validatorNamespace = validatorMeta.namespace.trim();
-  }
-
-  validatorKey = generateValidatorKey(validatorKey, validatorNamespace);
-
-  if(defaultValidatorKeys.includes(validatorKey)) {
-    throw new TypeError(
-      errorMessages.argNamesAreReserved
-        .replace(":argNames:", "keys")
-        .replace(":argTypes:", "validator keys")
-        .replace(":argValues:", defaultValidatorKeys.join("\n"))
-    );
-  }
+  validatorKey = preValidatorRegistrationCheck(validatorKey, validatorFn, validatorMeta, defaultValidatorKeys);
 
   if(this.hasValidator(validatorKey)) {
     throw new TypeError(
       errorMessages.objectWithKeyExists
         .replace(":object:", "A validator")
         .replace(":key:", validatorKey)
-    );
-  }
-
-  if(!(is.function(validatorFn))) {
-    throw new TypeError(
-      errorMessages.functionParamExpectsType
-        .replace(":param:", "validatorFn")
-        .replace(":type:", "a function")
     );
   }
 
@@ -363,7 +328,7 @@ SmartField.prototype.addValidator = function addValidator(validatorKey, validato
  * @param {String} type (optional): "addon"|"default".
  * @returns {Object} with members: `default` and/or `addon`.
  */
-SmartField.prototype.getValidators = function(type) {
+SmartField.prototype.getValidators = function getValidators(type) {
   type = is.string(type) ? type.toLowerCase().trim() : "";
 
   const validators = {
@@ -483,16 +448,6 @@ SmartField.prototype.watch = function watch(callback) {
 
 
 // Helpers
-
-function generateValidatorKey(key, namespace) {
-  if(key.length > 0 && namespace.length > 0) {
-    return `${namespace}.${key}`.toLowerCase();
-  } else if(key.length > 0) {
-    return key.toLowerCase();
-  } else {
-    return "";
-  }
-}
 
 function getHtmlSelectElementSelectedOption(selectElement) {
   return {

@@ -1,6 +1,6 @@
 const effects = require("../../src/effects");
 const errorMessages = require("../../src/error-messages");
-const { getEffectNames } = require("../../src/helpers");
+const { createListFromArray, getEffectNames } = require("../../src/helpers");
 const { wrapWithDOMFunctionality } = require("../test-helpers");
 
 
@@ -142,7 +142,7 @@ function useEffect(it, expect) {
         errorMessages.argNamesAreReserved
           .replace(":argNames:", "names")
           .replace(":argTypes:", "effect names")
-          .replace(":argValues:", defaultEffectNames.join("\n"))
+          .replace(":argValues:", createListFromArray(defaultEffectNames))
       );
     });
   });

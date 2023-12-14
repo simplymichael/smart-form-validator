@@ -29,9 +29,11 @@ module.exports = {
   createListFromArray,
   generateEffectName,
   getEffectNames,
+  getValidatorNames,
   isSubmitBtn,
   normalizeId,
   preEffectRegistrationCheck,
+  preValidatorRegistrationCheck,
   validateId,
   APP_CLASSNAME,
   DISABLED_FIELD_CLASSNAME,
@@ -106,6 +108,10 @@ function getEffectNames(effects) {
   return effectNames;
 }
 
+function getValidatorNames(validators) {
+  return Object.keys(validators);
+}
+
 function isSubmitBtn(element) {
   return element.type === "submit" || element.role === "submit-button";
 }
@@ -171,13 +177,71 @@ function preEffectRegistrationCheck(effect, defaultEffectNames) {
       errorMessages.argNamesAreReserved
         .replace(":argNames:", "names")
         .replace(":argTypes:", "effect names")
-        .replace(":argValues:", defaultEffectNames.join("\n"))
+        .replace(":argValues:", createListFromArray(defaultEffectNames))
     );
   }
 
   return { ...effect, name: effectName };
 }
 
+function preValidatorRegistrationCheck(validatorKey, validatorFn, validatorMeta, defaultValidatorKeys) {
+  if(!(is.string(validatorKey))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "validatorKey")
+        .replace(":type:", "a string")
+    );
+  }
+
+  let validatorNamespace = "";
+
+  validatorKey = validatorKey.trim();
+
+  if(!validatorKey) {
+    throw new TypeError(
+      errorMessages.fieldCannotBeEmpty
+        .replace(":field:", "validatorKey")
+        .replace(":type:", "string"));
+  }
+
+  if(is.object(validatorMeta) && is.string(validatorMeta.namespace)) {
+    validatorNamespace = validatorMeta.namespace.trim();
+  }
+
+  validatorKey = generateValidatorKey(validatorKey, validatorNamespace);  
+
+  if(defaultValidatorKeys.includes(validatorKey)) {
+    throw new TypeError(
+      errorMessages.argNamesAreReserved
+        .replace(":argNames:", "keys")
+        .replace(":argTypes:", "validator keys")
+        .replace(":argValues:", createListFromArray(defaultValidatorKeys))
+    );
+  }
+
+  if(!(is.function(validatorFn))) {
+    throw new TypeError(
+      errorMessages.functionParamExpectsType
+        .replace(":param:", "validatorFn")
+        .replace(":type:", "a function")
+    );
+  }
+
+  return validatorKey;
+}
+
 function validateId(id) {
   return ["number", "string"].includes(typeof id) && Boolean(id);
+}
+
+
+// Helpers 
+function generateValidatorKey(key, namespace) {
+  if(key.length > 0 && namespace.length > 0) {
+    return `${namespace}.${key}`;
+  } else if(key.length > 0) {
+    return key;
+  } else {
+    return "";
+  }
 }

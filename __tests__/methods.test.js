@@ -19,6 +19,8 @@ module.exports = function methodsTest() {
         addField: require("../src/methods/addField"),
         addFields: require("../src/methods/addFields"),
         addRule: require("../src/methods/addRule"),
+        addValidator: require("../src/methods/addValidator"),
+        getValidators: require("../src/methods/getValidators"),
         getEffects: require("../src/methods/getEffects"),
         getField: require("../src/methods/getField"),
         getFields: require("../src/methods/getFields"),

@@ -5,6 +5,8 @@ const instanceMethodNames = [
   "addField",
   "addFields",
   "addRule",
+  "addValidator", 
+  "getValidators",
   "getEffects",
   "getField",
   "getFields",

@@ -5,8 +5,8 @@ const SmartForm = require("./smart-form");
 
 const staticMethods = ["getEffects", "useEffect"];
 const instanceMethods = [
-  "addField", "addFields", "addRule", "removeRule", "getField", "getFields",
-  "getEffects", "useEffect", "toJSON", "validate", "watch"
+  "addField", "addFields", "addRule", "removeRule", "addValidator", "getValidators", 
+  "getField", "getFields", "getEffects", "useEffect", "toJSON", "validate", "watch"
 ];
 
 
