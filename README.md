@@ -434,13 +434,15 @@ See [CHANGELOG][changelog]
 - Checkout main branch: `git checkout main`.
 - Merge latest changes from develop into main branch: `git merge develop`.
 - Build: `npm run build`.
+- Stage build: `git add dist`.
+- Commit build: `git commit -m ":rocket: Build latest version"`.
 - Run release script: `npm run release:[major|minor|patch]`.
 - Inspect the **CHANGELOG.md** file and make any necessary adjustments.
 - Inspect the **package.json** file (`package.json.version`) and make any necessary adjustments.
-- Stage changes: `git add dist CHANGELOG.md package*.json`
-- Commit build and version number bump: 
-  `git commit -m "Build latest version, update CHANGELOG.md, and bump version number from <prev_ver> to <curr_ver>"`.
-- Tag build: `git tag -a vx.x.x -m "<tag summary>"`.
+- Stage changes: `git add CHANGELOG.md package*.json`
+- Commit CHANGELOG update and version number bump: 
+  `git commit -m ":books: Update CHANGELOG.md, and :package: bump version number from <prev_ver> to <curr_ver>"`.
+- Tag build: `git tag -a vx.x.x -m ":bookmark: <tag summary>"`.
 - Push to github: `git push && git push origin --tags`. 
 - Draft release on GitHub (optional).
 - Publish to NPM: `npm publish`.
