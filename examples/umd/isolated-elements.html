@@ -1,0 +1,77 @@
+<Doctype html>
+
+    <html>
+      <head>
+        <title>Smart Form Validator - Browser Examples</title>
+        <link rel="stylesheet" href="../../dist/css/smart-form-validator.min.css" />
+        <link rel="stylesheet" href="../examples.css" />
+        <script type="text/javascript" src="../../dist/smart-form-validator.js"></script>
+      </head>
+      <body>
+        <ul>
+          <li><a href="./">Back</a></li>
+        </ul>
+
+        <h3>Stand-alone input elements</h3>
+        <div>
+          <input id="firstname-field" type="text" autocomplete="off" role="presentation" placeholder="Enter your Firstname" />
+          <p id="free-text-paragraph" contenteditable="true" data-placeholder="contenteditable field"></p>
+        </div>
+
+        <div>
+          <input id="accept-terms-field" type="checkbox" /> Accept terms
+        </div>
+
+        <input id="submit-button" type="submit" value="Submit Form" />
+    
+        <script type="text/javascript">
+          const firstnameField = document.getElementById("firstname-field");
+          const acceptTermsField = document.getElementById("accept-terms-field");
+          const firstnameRule = { length: { min: 3, max: 5 } };
+          const acceptTermsRule = { type: "checkbox", required: true };
+          const submitButton = document.getElementById("submit-button");
+          const formValidator = new SmartFormValidator();
+    
+          formValidator.addField(firstnameField, firstnameRule);
+          formValidator.addField("free-text-paragraph", { type: "ascii", length: { min: 5, max: 50 } });
+          formValidator.addField(acceptTermsField, acceptTermsRule);
+          formValidator.addField(submitButton);
+          formValidator.watch();
+        </script>
+
+        <p>&nbsp;</p>
+ 
+        <h3>Code</h3>
+        <code>
+          &lt;head&gt; <br />
+            &nbsp;&nbsp;&lt;link <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;href="https://cdn.jsdelivr.net/npm/smart-form-validator/dist/css/smart-form-validator.min.css" <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;rel="stylesheet" /&gt; <br />
+
+            &nbsp;&nbsp;&lt;script src="https://cdn.jsdelivr.net/npm/smart-form-validator/dist/smart-form-validator.min.js"&gt;&lt;/script&gt; <br />
+          &lt;/head&gt; <br /><br />
+          ...
+          <br /><br />
+          &lt;input id="firstname-field" type="text" /&gt; <br />
+          &lt;p id="free-text-paragraph" contenteditable="true"&gt;&lt;/p&gt; <br />
+          &lt;input id="accept-terms-field" type="checkbox" /&gt; Accept terms <br />
+          &lt;input id="submit-button" type="submit" value="Submit Form" /&gt; <br /><br />
+
+          &lt;script type="text/javascript"&gt; <br />
+            const firstnameField = document.getElementById("firstname-field"); <br />
+            const acceptTermsField = document.getElementById("accept-terms-field"); <br />
+            const firstnameRule = { length: { min: 3, max: 5 } }; <br />
+            const acceptTermsRule = { type: "checkbox", required: true }; <br />
+            const submitButton = document.getElementById("submit-button"); <br />
+            const formValidator = new SmartFormValidator(); <br /><br />
+      
+            formValidator.addField(firstnameField, firstnameRule); <br />
+            formValidator.addField("free-text-paragraph", { type: "ascii", length: { min: 5, max: 50 } }); <br />
+            formValidator.addField(acceptTermsField, acceptTermsRule); <br />
+            formValidator.addField(submitButton); <br />
+            formValidator.watch(); <br />
+            &lt;/script&gt;
+        </code>
+        <br /><br />
+      </body>
+    </html>

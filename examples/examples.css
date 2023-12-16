@@ -1,5 +1,23 @@
+body { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+}
 form { text-align: center; }
 div { margin-bottom: 10px; }
+[contenteditable="true"], [contenteditable="true"]:focus {
+  border: thin dotted #ccc !important;
+  padding: 5px 10px;
+  padding-right: 0;
+  border-radius: 3px;
+  max-width: 240px;
+  cursor: auto;
+}
+[contenteditable="true"]:empty:not(:focus)::before {
+  content:attr(data-placeholder);
+  font-style: italic;
+  color: #aaa;
+}
 form p.descriptor {
   display: inline-block; 
   width: 250px;

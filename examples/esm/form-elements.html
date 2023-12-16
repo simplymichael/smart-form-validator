@@ -1,0 +1,67 @@
+<Doctype html>
+
+    <html>
+      <head>
+        <title>Smart Form Validator - ES Module Examples</title>
+        <link rel="stylesheet" href="../../dist/css/smart-form-validator.min.css" />
+        <link rel="stylesheet" href="../examples.css" />
+      </head>
+      <body>
+        <ul>
+          <li><a href="./">Back</a></li>
+        </ul>
+    
+        <h3>Input elements belonging to an HTML form</h3>
+        <form id="test-form">
+          <input type="text" id="name-field" role="presentation" autocomplete="off" placeholder="Firstname" />
+          <input type="email" id="email-field" role="presentation" autocomplete="off" placeholder="Email" />
+          <button id="submit-form-button" role="submit-button">Submit Form</button>
+        </form>
+    
+        <script type="module">
+          import SmartFormValidator from "../../dist/esm/smart-form-validator.js";  // import the SmartFormValidator 
+
+          const form = document.getElementById("test-form");
+          const name = document.getElementById("name-field");
+          const email = document.getElementById("email-field");
+          
+          // When a form has an `<input type="submit" or 
+          // an element with `role="submit-button",
+          // adding the submit button via `addField()` is optional.
+          new SmartFormValidator()
+            .addForm(form)
+            .addRule({ field: name, length: { min: 3, max: 5 } })
+            .addRule({ field: "email-field", type: "email" })
+            .watch();
+        </script>
+
+        <h3>Code</h3>
+        <code>
+          &lt;form id="test-form"&gt; <br />
+            &nbsp;&nbsp;&lt;input type="text" id="name-field" /&gt; <br />
+            &nbsp;&nbsp;&lt;input type="email" id="email-field" /&gt; <br />
+            &nbsp;&nbsp;&lt;button id="submit-form-button" role="submit-button">Submit Form&lt;/button&gt; <br />
+          &lt;/form&gt; <br /><br />
+      
+          &lt;script type="module"&gt; <br />
+            &sol;&sol; import `SmartFormValidator` <br />
+            import SmartFormValidator from "https://cdn.jsdelivr.net/npm/smart-form-validator/dist/esm/smart-form-validator.js"; 
+            <br /><br />
+
+            const form = document.getElementById("test-form"); <br />
+            const name = document.getElementById("name-field"); <br />
+            const email = document.getElementById("email-field"); <br /><br />
+            
+            &sol;&sol; When a form has an `&lt;input type="submit" or <br />
+            &sol;&sol; an element with `role="submit-button", <br />
+            &sol;&sol; adding the submit button via `addField()` is optional. <br />
+            new SmartFormValidator() <br />
+              &nbsp;&nbsp;.addForm(form) <br />
+              &nbsp;&nbsp;.addRule({ field: name, length: { min: 3, max: 5 } }) <br />
+              &nbsp;&nbsp;.addRule({ field: &quot;email-field&quot;, type: &quot;email&quot; }) <br />
+              &nbsp;&nbsp;.watch(); <br />
+          &lt;/script&gt;
+        </code>
+        <br /><br />
+      </body>
+    </html>
