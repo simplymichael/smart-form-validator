@@ -16,7 +16,7 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 
 ## Installation
 
-Using npm:
+**Using npm:**
 
 ```bash
 npm install smart-form-validator --save
@@ -31,29 +31,29 @@ import SmartFormValidator from "smart-form-validator";
 // const SmartFormValidator = require("smart-form-validator");
 ```
 
-Using jsDelivr CDN:  
+**Using jsDelivr CDN:**
 ```html
 <script 
   src="https://cdn.jsdelivr.net/npm/smart-form-validator/dist/smart-form-validator.min.js"></script>
 ``` 
 `SmartFormValidator` is now available as a property of the global object.
 
-Using unpkg CDN:
+**Using unpkg CDN:**
 ```html
 <script src="https://unpkg.com/smart-form-validator/dist/smart-form-validator.min.js"></script>
 ```
 `SmartFormValidator` is now available as a property of the global object.
 
-### Using default effects styles
+### Applying default effects styles
 To get the default effects styles applied to our form fields, we need to add the CSS file to our page. 
 
-Using jsDelivr CDN:
+**Using jsDelivr CDN:**
 ```html
 <link href="https://cdn.jsdelivr.net/npm/smart-form-validator/dist/css/smart-form-validator.min.css" 
   rel="stylesheet" />
 ```
 
-Using unpkg CDN: 
+**Using unpkg CDN:**
 ```html
 <link href="https://unpkg.com/smart-form-validator/dist/css/smart-form-validator.min.css" 
   rel="stylesheet" />
@@ -412,23 +412,36 @@ validator.addValidator(validatorName, validatorFunc, validatorMeta);
 - Run `npm run examples`
 - Navigate to *localhost:8080/examples*
 
-  
-## Testing
-- Run all tests: `npm test`.
-- Test a module: `npm test -- --<module_name>`. 
-  Example: `npm test -- --SmartFormValidator`.
-- Test a module method: `npm test -- --<module_name>::<method_name>`. 
-  Example: `npm test -- --SmartFormValidator::addField`.
-- Run all tests with coverage report: `npm run test:coverage`.
+
+## Contributing
+- <a name="report-a-bug">[Report a bug][bug]</a>
+- <a name="request-a-new-feature">[Request a new feature][fr]</a>
+- <a name="submit-a-pull-request">[Submit a pull request][pr]</a>
+- <a name="contributing-guide">Checkout the [Contributing guide][contribute]</a>
+
+
+## CHANGELOG
+See [CHANGELOG][changelog]
+
+
+## License
+[MIT License][license-url]
+
+
+## Author
+[Simplymichael](https://github.com/simplymichael) ([simplymichaelorji@gmail.com](mailto:simplymichaelorji@gmail.com))
 
 
 ## Release process (manual)
 - Checkout main branch: `git checkout main`.
 - Merge latest changes from develop into main branch: `git merge develop`.
-- Bump version number in package.json file.
 - Build: `npm run build`.
+- Run release script: `npm run release:[major|minor|patch]`.
+- Inspect the **CHANGELOG.md** file and make any necessary adjustments.
+- Inspect the **package.json** file (`package.json.version`) and make any necessary adjustments.
+- Stage changes: `git add dist CHANGELOG.md package*.json`
 - Commit build and version number bump: 
-  `git commit -m "Build latest version and bump version number from <prev_ver> to <curr_ver>"`.
+  `git commit -m "Build latest version, update CHANGELOG.md, and bump version number from <prev_ver> to <curr_ver>"`.
 - Tag build: `git tag -a vx.x.x -m "<tag summary>"`.
 - Push to github: `git push && git push origin --tags`. 
 - Draft release on GitHub (optional).
@@ -458,3 +471,8 @@ validator.addValidator(validatorName, validatorFunc, validatorMeta);
 [codecov-image]: https://img.shields.io/codecov/c/github/simplymichael/smart-form-validator?token=IGGXAP7WXO
 
 [ascii]: https://en.wikipedia.org/wiki/ASCII
+[bug]: https://github.com/simplymichael/smart-form-validator/labels/bug
+[changelog]: https://github.com/simplymichael/smart-form-validator/blob/master/CHANGELOG.md
+[contribute]: https://github.com/simplymichael/smart-form-validator/blob/master/CONTRIBUTING.md
+[fr]: https://github.com/simplymichael/smart-form-validator/labels/feature%20request
+[pr]: https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request
