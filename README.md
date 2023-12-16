@@ -116,15 +116,15 @@ that give the user (instant) feedback regarding the value they have entered into
    They state the conditions that field values must fulfill to be valid.
 3. **Validators:** Validators check that data entered into fields 
    comply with the rules specified for those fields. 
-4. **Effects:** Effects are actions that perform state changes on fiedls based on the results of validation.
+4. **Effects:** Effects are actions that perform state changes on fields based on the results of validation.
 
 
 ## Concepts (details)
 ### 1. Fields 
 <a id="fields"></a>
-A field is a receptor of user data and is the subject of validation. A field can be any HTML element type
-such as `input`, `checkbox`, `textarea`, `select`, and `contenteditable` elements.
-A field must have an `id` property. A field may optionally have a `role` and a `getValue` properties.
+A field is a receptor of user data and is the subject of validation. A field can be any HTML element 
+capable of receiving user input such as `input`, `checkbox`, `textarea`, `select`, and `contenteditable` elements.
+A field must have an `id` property. A field may optionally have a `role` and `getValue` properties.
 
 If we have a `button` or `input` whose `type` is not `submit`
 but on which we want effects that handle submit buttons to have access, 
@@ -132,7 +132,7 @@ a `role` attribute with the value of `submit-button` is required for that field.
 
 The `getValue` property, if provided, must be a function. 
 This function is used to get the current value of the field 
-if the field is not a `contenteditable` field and is not one of `input`, `checkbox`, `textarea`, `select`.
+if the field is not a `contenteditable` field and is not one of `input`, `checkbox`, `textarea`, or `select`.
 
 The state of a field changes in response to the data entered 
 and its adherence to the constraints or rules defined for/placed on that field.
@@ -147,11 +147,10 @@ Rules are plain JavaScript objects with one required property: `field`.
 The value of the `field` can be either the element's `id` or, 
 in instances where we have previously obtained a reference to the element, the element reference.
 
-Other properties of a rule depend on the type of the field and 
-specify the constraints we want placed on the target field. 
+Other properties of a rule depend on the type of the field, and specify the constraints we want placed on the field. 
 
 #### Default constraints
-The current default supported rules are: 
+The current default supported constraints are: 
 - **`type` {String}:** specifies the acceptable data type of the value for this field, 
   one of either (`"alnum"`|`"alpha"`|`"ascii"`|`"email"`|`"number"`). Default is `alnum`.
 - **`required` {Boolean}:** specifies whether the field is required (`true`) or not (`false`).
@@ -213,7 +212,7 @@ The following validators come built-in corresponding with the default constraint
 - **`requiredFieldValidator`:** checks that a field has some data entered into it.
 
 **Notes**
-- For a constraint to be checked during validation, there must be a corresponding validator defined for it.
+- For a custom constraint to be checked during validation, there must be a corresponding validator defined for it.
 - We can create custom validators that make use of the [default constraints](#default-constraints) 
   or that define their own rules.
   See the [Creating custom validators](#creating-custom-validators) section for more on how to do this.
@@ -261,10 +260,9 @@ A validator should return `true` if the field it is validating passed the valida
 Otherwise it should return `false`.
 
 ### Registering validators 
-After creating a validator, we must register it with the `addValidator(name, validator, meta)` method
-of the `SmartFormValidator` instance.
+After creating a validator, we must register it with the `addValidator` method of the `SmartFormValidator` instance.
 
-`addValidator` takes three arguments:
+`addValidator` takes three ordered arguments:
 - **`name` {String} (required):** an arbitrary string that can serve as a unique name for the validator.
 - **`validator` {Function} (required):** the validator function itself.
 - **`meta` {Object} (optional):** an object that holds meta information about the validator. 
@@ -277,13 +275,13 @@ of the `SmartFormValidator` instance.
    A validator should deal with just one aspect of the constraints on a field 
    rather than attempting to determine if every constraint on the field has been met.
    For example, instead of having a validator that checks for a `required` state, 
-   a maximum length constraint, and whether or not the fields contains numbers, 
+   a maximum length constraint, and whether or not the field contains numbers, 
    it's better to have separate validators for each of these checks: 
    one to check for `required`, another to ensure the `length` constraint is met, 
    and yet another to check that the `number` constraint is fulfilled.
    Each of these validators will be called with the rule and the result of the previous validator.
 2. A validator should return only `true` or `false` values. 
-   A validator should not directly perform a side-effect on a field in the event of a 
+   A validator should not throw errors nor otherwise perform a side-effect on a field in the event of a 
    successful or failed validation. Any such effects should be delegated to [effects](#effects).
 
    In the end, the validation process is reduced to a binary *passing* or *failing* test.
@@ -330,8 +328,8 @@ In both cases, `useEffect` expects the complete effect object as its argument.
 Say we have a field 
 and we want to define a constraint on that field so that it only accepts objects (or JSON strings).
 First, we'd create a rule stating that requirement. 
-The rule will have a `field` property that specifies the target field. 
-We may omit this property while creating the rule, but must specify it when adding the rule to the field.
+The rule should have a `field` property that specifies the target field. However,  
+we may omit this property while creating the rule, but must specify it when adding the rule to the field.
 ```js
 const objectExpectedRule = { type: "object" };
 ```
@@ -348,7 +346,7 @@ const validator = new SmartFormValidator();
 // the last is useful when the field is part of a form): 
 
 // 1. 
-validator.addField(fieldId, objectExpectedRule); // specify field and rule in one line 
+validator.addField(fieldId, objectExpectedRule); // specify field and rule at the same time, on one line 
 
 // Or ...
 // 2.  
