@@ -11,12 +11,12 @@ A highly customizable, "somewhat" declarative approach to HTML form fields valid
 
 
 ## 
-<img src="./imgs/smart-form-validator-demo-7.gif" alt="smart-form-validator Demo Sign-up Form" />
+<img src="./imgs/smart-form-validator-demo-8.gif" alt="smart-form-validator Demo - Sign up form" />
 
 
 ## Installation
 
-### NPM
+Using npm:
 
 ```bash
 npm install smart-form-validator --save
@@ -26,23 +26,36 @@ Later in our code:
 
 ```js
 import SmartFormValidator from "smart-form-validator";
+
+// Or if you prefer: 
+// const SmartFormValidator = require("smart-form-validator");
 ```
 
-### Using the `<script>` tag
-
-Add JS file to page: 
-```
+Using jsDelivr CDN:  
+```html
 <script 
-  src="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/smart-form-validator.min.js"></script>
+  src="https://cdn.jsdelivr.net/npm/smart-form-validator/dist/smart-form-validator.min.js"></script>
 ``` 
 `SmartFormValidator` is now available as a property of the global object.
 
+Using unpkg CDN:
+```html
+<script src="https://unpkg.com/smart-form-validator/dist/smart-form-validator.min.js"></script>
+```
+`SmartFormValidator` is now available as a property of the global object.
 
 ### Using default effects styles
-To get the default effects styles applied to our form fields, we need to add the CSS file to our page: 
-```css
-<link 
-  href="https://cdn.jsdelivr.net/npm/smart-form-validator@0.1.0-alpha/dist/css/smart-form-validator.min.css" 
+To get the default effects styles applied to our form fields, we need to add the CSS file to our page. 
+
+Using jsDelivr CDN:
+```html
+<link href="https://cdn.jsdelivr.net/npm/smart-form-validator/dist/css/smart-form-validator.min.css" 
+  rel="stylesheet" />
+```
+
+Using unpkg CDN: 
+```html
+<link href="https://unpkg.com/smart-form-validator/dist/css/smart-form-validator.min.css" 
   rel="stylesheet" />
 ```
 

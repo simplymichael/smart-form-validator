@@ -2,15 +2,15 @@
   "name": "smart-form-validator",
   "version": "0.1.0-alpha",
   "description": "A highly customizable, \"somewhat\" declarative form validator.",
-  "main": "dist/esm/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/cjs/smart-form-validator.js",
+  "module": "dist/esm/smart-form-validator.js",
   "files": [
     "dist"
   ],
   "scripts": {
     "prebuild": "npm run lint && npm run test:coverage",
-    "build": "shx rm -rf dist && npm run build:js && npm run build:css",
-    "build:dev": "shx rm -rf dist && npm run build:css && npm run build:js:dev",
+    "build": "npm run build:js && npm run build:css",
+    "build:dev": "npm run build:css && npm run build:js:dev",
     "build:css": "shx mkdir -p ./dist/css && shx cat ./src/effects/**/*.css | postcss > ./dist/css/smart-form-validator.min.css",
     "build:js": "cross-env NODE_ENV=production rollup -c",
     "build:js:dev": "cross-env NODE_ENV=development rollup -c -w",

@@ -49,8 +49,26 @@ function createConfig(env) {
       plugins,
       output: [
         {
-          dir: "dist/esm",
+          file: `dist/esm/${pkg.name}.js`,
           format: "esm",
+          exports: "default",
+          sourcemap: true,
+        },
+      ],
+    },
+
+    // Common JS
+    {
+      input,
+      plugins: [ 
+        nodeResolve(),
+        commonjs({ strictRequires: true }), 
+        babel({ babelHelpers: "bundled" }),
+      ],
+      output: [
+        {
+          file: `dist/cjs/${pkg.name}.js`,
+          format: "cjs",
           exports: "default",
           sourcemap: true,
         },
