@@ -1,6 +1,6 @@
 {
   "name": "smart-form-validator",
-  "version": "0.1.0-alpha",
+  "version": "0.2.0-alpha",
   "description": "A highly customizable, \"somewhat\" declarative form validator.",
   "main": "dist/cjs/smart-form-validator.js",
   "module": "dist/esm/smart-form-validator.js",
