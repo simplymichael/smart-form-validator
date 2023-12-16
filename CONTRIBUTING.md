@@ -109,21 +109,33 @@ When you are ready to have your changes merged, you can then [open a pull reques
 - Limit the first line (subject line) to 72 characters or less.
 - Reference issues and pull requests liberally after the first line.
 - Consider starting the commit message with an applicable emoji:
+    <!-- https://gist.github.com/parmentf/035de27d6ed1dce0b36a -->
     - :art: `:art:` when improving the format/structure of the code
+    - :bookmark: `:bookmark:` when creating a version tag
     - :racehorse: `:racehorse:` when improving performance
     - :non-potable_water: `:non-potable_water:` when plugging memory leaks
     - :memo: `:memo:` when writing docs
+    - :bulb: `:bulb:` when adding doc-comments to source code
+    - :package: `:package:` when making a change to `package.json`
     - :penguin: `:penguin:` when fixing something on Linux
     - :apple: `:apple:` when fixing something on macOS
     - :checkered_flag: `:checkered_flag:` when fixing something on Windows
     - :bug: `:bug:` when fixing a bug
+    - :ambulance: `:ambulance:` whem making a critical hot fix
+    - :hammer: `:hammer:` when refactoring code
+    - :wheelchair: `:wheelchair:` when making accessibility (a11y) changes
     - :fire: `:fire:` when removing code or files
     - :green_heart: `:green_heart:` when fixing the CI build
     - :white_check_mark: `:white_check_mark:` when adding tests
+    - :heavy_check_mark: `:heavy_check_mark:` when making tests pass
     - :lock: `:lock:` when dealing with security
     - :arrow_up: `:arrow_up:` when upgrading dependencies
     - :arrow_down: `:arrow_down:` when downgrading dependencies
     - :shirt: `:shirt:` when removing linter warnings
+    - :zap: `:zap:` when making general updates
+    - :boom: `:boom:` when making breaking changes
+    - :ok_hand: `:ok_hand:` code-review: okay
+    - :hankey: `:hankey:` code-review: needs improvement
 
 ## Help needed
 
