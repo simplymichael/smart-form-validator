@@ -61,8 +61,14 @@ To get the default effects styles applied to our form fields, we need to add the
 
 
 ## Quick start
+**1. Using regular `script` tag**:
 ```html
 <html>
+  <head>
+  	<link href="https://cdn.jsdelivr.net/npm/smart-form-validator/dist/css/smart-form-validator.min.css" 
+        rel="stylesheet" />
+    <script src="https://unpkg.com/smart-form-validator/dist/smart-form-validator.min.js"></script>
+  </head>
   <body>
     <form id="signup-form">
       <input type="text" id="name-field" />
@@ -70,7 +76,34 @@ To get the default effects styles applied to our form fields, we need to add the
       <button role="submit-button">Sign up</button>
     </form>
 
-    <script src="signup-form-validator.js"></script>
+    <script>
+      const form = document.getElementById("signup-form");
+
+      new SmartFormValidator()
+        .addForm(form)
+        .addRule({ field: "name-field", type: "ascii", length: { min: 3, max: 10 } }) // expects only ASCII strings between 3 to 10 characters long
+        .addRule({ field: "email-field", type: "email" }) // expects only valid email formats
+        .watch(); // watch the input fields for changes, ensuring that they adhere to the specified constraints
+    </script>
+  </body>
+</html>
+```
+
+**2. Using as an ES Module:**
+```html
+<html>
+  <head>
+    <link href="https://unpkg.com/smart-form-validator/dist/css/smart-form-validator.min.css" 
+      rel="stylesheet" />
+  </head>
+  <body>
+    <form id="signup-form">
+      <input type="text" id="name-field" />
+      <input type="email" id="email-field" />
+      <button role="submit-button">Sign up</button>
+    </form>
+
+    <script type="module" src="signup-form-validator.js"></script>
   </body>
 </html>
 ```
@@ -78,14 +111,18 @@ To get the default effects styles applied to our form fields, we need to add the
 ```js
 // File: signup-form-validator.js
 
+// If you've installed smart-form-validator using `npm install smart-form-validator`
 import SmartFormValidator from "smart-form-validator";
 
-const form = document.getElementById("test-form");
+// Otherwise, 
+// import SmartFormValidator from "https://unpkg.com/smart-form-validator/dist/esm/smart-form-validator.js";
+
+const form = document.getElementById("signup-form");
 
 new SmartFormValidator()
   .addForm(form)
-  .addRule({ field: "name-field", type: "ascii" }) // acccepts only ASCII chars including whitespace
-  .addRule({ field: "email-field", type: "email" }) // accepts only valid emails (format, not function)
+  .addRule({ field: "name-field", type: "ascii", length: { min: 3, max: 10 } }) // expects only ASCII strings between 3 to 10 characters long
+  .addRule({ field: "email-field", type: "email" }) // expects only valid email formats
   .watch(); // watch the input fields for changes, ensuring that they adhere to the specified constraints
 ```
 
