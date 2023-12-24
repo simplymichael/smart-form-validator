@@ -110,6 +110,7 @@ When you are ready to have your changes merged, you can then [open a pull reques
 - Reference issues and pull requests liberally after the first line.
 - Consider starting the commit message with an applicable emoji:
     <!-- https://gist.github.com/parmentf/035de27d6ed1dce0b36a -->
+    - :sparkles: `:sparkles:` when adding a new feature
     - :art: `:art:` when improving the format/structure of the code
     - :bookmark: `:bookmark:` when creating a version tag
     - :racehorse: `:racehorse:` when improving performance
