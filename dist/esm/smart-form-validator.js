@@ -847,7 +847,10 @@ function requireSmartField() {
   var effects = requireEffects();
   var errorMessages = errorMessages$3;
   var APP_CLASSNAME = helpers.APP_CLASSNAME,
+    DISABLED_FIELD_CLASSNAME = helpers.DISABLED_FIELD_CLASSNAME,
     SMART_FIELD_CLASSNAME = helpers.SMART_FIELD_CLASSNAME,
+    VALID_FIELD_CLASSNAME = helpers.VALID_FIELD_CLASSNAME,
+    INVALID_FIELD_CLASSNAME = helpers.INVALID_FIELD_CLASSNAME,
     is = helpers.is,
     object = helpers.object,
     generateEffectName = helpers.generateEffectName,
@@ -1216,7 +1219,7 @@ function requireSmartField() {
     var validationPassed = validators.reduce(function (passed, fn) {
       return passed && fn(value, rule, passed, extras);
     }, true);
-    effects.forEach(function (_ref) {
+    effects.forEach(function invokeValidationResultEffect(_ref) {
       var valid = _ref.valid,
         invalid = _ref.invalid;
       if (validationPassed) {
@@ -1251,6 +1254,27 @@ function requireSmartField() {
     input.addEventListener(targetEvent, function () {
       return _this.validate(_, callback);
     }); // eslint-disable-line
+  };
+
+  SmartField.prototype.reset = function reset() {
+    var element = this.getElement();
+    var _this$getEffects2 = this.getEffects(),
+      defaultEffects = _this$getEffects2["default"],
+      addonEffects = _this$getEffects2.addon;
+    var effects = Array.from(defaultEffects.values()).concat(Array.from(addonEffects.values()));
+    element.classList.remove(APP_CLASSNAME);
+    element.classList.remove(DISABLED_FIELD_CLASSNAME);
+    element.classList.remove(SMART_FIELD_CLASSNAME);
+    element.classList.remove(VALID_FIELD_CLASSNAME);
+    element.classList.remove(INVALID_FIELD_CLASSNAME);
+    claimField(element);
+    if (effects.length > 0) {
+      effects.forEach(function reInitEffect(effect) {
+        if (is["function"](effect.init)) {
+          effect.init(element);
+        }
+      });
+    }
   };
 
   // Helpers
@@ -1584,6 +1608,21 @@ function requireRemoveRule() {
   return removeRule;
 }
 
+var reset;
+var hasRequiredReset;
+function requireReset() {
+  if (hasRequiredReset) return reset;
+  hasRequiredReset = 1;
+  reset = function reset() {
+    if (typeof this.getFields === "function") {
+      this.getFields().forEach(function resetField(field) {
+        field.reset();
+      });
+    }
+  };
+  return reset;
+}
+
 /**
  * Support JSON.stringify
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
@@ -1645,7 +1684,7 @@ function requireUseEffect() {
 
     // Add the effect to the elements attached to the instance.
     if (typeof this.getFields === "function") {
-      this.getFields().forEach(function (field) {
+      this.getFields().forEach(function registerEffectForField(field) {
         var _effect$meta;
         if (!field.usesEffect(effect.name, (_effect$meta = effect.meta) === null || _effect$meta === void 0 ? void 0 : _effect$meta.namespace)) {
           field.useEffect(effect);
@@ -1656,19 +1695,25 @@ function requireUseEffect() {
   return useEffect;
 }
 
-/**
- * @returns {Boolean}: the overall result of the entire validation
- */
 var validate;
 var hasRequiredValidate;
 function requireValidate() {
   if (hasRequiredValidate) return validate;
   hasRequiredValidate = 1;
+  var isSubmitBtn = helpers.isSubmitBtn;
+
+  /**
+   * @returns {Boolean}: the overall result of the entire validation
+   */
   validate = function validate() {
-    var validated = this.getFields().map(function (field) {
+    var fields = this.getFields();
+    var targetFields = fields.filter(function filterOutSubmitButton(field) {
+      return !isSubmitBtn(field.getElement());
+    });
+    var validated = targetFields.map(function validateField(field) {
       return field.validate();
     });
-    return validated.every(function (passed) {
+    return validated.every(function fieldPassedValidation(passed) {
       return Boolean(passed);
     });
   };
@@ -1830,6 +1875,7 @@ function getDynamicModules() {
 		"/src/methods/getFields.js": requireGetFields,
 		"/src/methods/getValidators.js": requireGetValidators,
 		"/src/methods/removeRule.js": requireRemoveRule,
+		"/src/methods/reset.js": requireReset,
 		"/src/methods/toJSON.js": requireToJSON,
 		"/src/methods/useEffect.js": requireUseEffect,
 		"/src/methods/validate.js": requireValidate,
@@ -1923,7 +1969,7 @@ function normalize (path) {
 
 var errorMessages$1 = errorMessages$3;
 var createListFromArray = helpers.createListFromArray;
-var instanceMethodNames = ["addField", "addFields", "addRule", "addValidator", "getValidators", "getEffects", "getField", "getFields", "removeRule", "toJSON", "useEffect", "validate", "watch"];
+var instanceMethodNames = ["addField", "addFields", "addRule", "addValidator", "getValidators", "getEffects", "getField", "getFields", "removeRule", "reset", "toJSON", "useEffect", "validate", "watch"];
 var staticMethodNames = ["getEffects", "useEffect"];
 var methods = {
   addInstanceMethod: addInstanceMethod$2,
@@ -1967,7 +2013,7 @@ var is = helpers.is,
 var addInstanceMethod$1 = methods.addInstanceMethod,
   addStaticMethod$1 = methods.addStaticMethod;
 var staticMethods$1 = ["getEffects", "useEffect"];
-var instanceMethods$1 = ["addRule", "removeRule", "getField", "getFields", "getEffects", "useEffect", "toJSON", "validate", "watch"];
+var instanceMethods$1 = ["addRule", "removeRule", "getField", "getFields", "getEffects", "reset", "useEffect", "toJSON", "validate", "watch"];
 var smartForm = SmartForm$1;
 
 /**
@@ -2042,7 +2088,7 @@ var addInstanceMethod = methods.addInstanceMethod,
   addStaticMethod = methods.addStaticMethod;
 var SmartForm = smartForm;
 var staticMethods = ["getEffects", "useEffect"];
-var instanceMethods = ["addField", "addFields", "addRule", "removeRule", "addValidator", "getValidators", "getField", "getFields", "getEffects", "useEffect", "toJSON", "validate", "watch"];
+var instanceMethods = ["addField", "addFields", "addRule", "removeRule", "addValidator", "getValidators", "getField", "getFields", "getEffects", "reset", "useEffect", "toJSON", "validate", "watch"];
 var smartFormValidator = SmartFormValidator$1;
 function SmartFormValidator$1() {
   this.fields = [];

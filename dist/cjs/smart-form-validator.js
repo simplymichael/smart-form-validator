@@ -377,7 +377,7 @@ function requireMethods() {
   var errorMessages = requireErrorMessages();
   var _require$$ = requireHelpers(),
     createListFromArray = _require$$.createListFromArray;
-  var instanceMethodNames = ["addField", "addFields", "addRule", "addValidator", "getValidators", "getEffects", "getField", "getFields", "removeRule", "toJSON", "useEffect", "validate", "watch"];
+  var instanceMethodNames = ["addField", "addFields", "addRule", "addValidator", "getValidators", "getEffects", "getField", "getFields", "removeRule", "reset", "toJSON", "useEffect", "validate", "watch"];
   var staticMethodNames = ["getEffects", "useEffect"];
   methods = {
     addInstanceMethod: addInstanceMethod,
@@ -922,7 +922,10 @@ function requireSmartField() {
   var errorMessages = requireErrorMessages();
   var _require$$ = requireHelpers(),
     APP_CLASSNAME = _require$$.APP_CLASSNAME,
+    DISABLED_FIELD_CLASSNAME = _require$$.DISABLED_FIELD_CLASSNAME,
     SMART_FIELD_CLASSNAME = _require$$.SMART_FIELD_CLASSNAME,
+    VALID_FIELD_CLASSNAME = _require$$.VALID_FIELD_CLASSNAME,
+    INVALID_FIELD_CLASSNAME = _require$$.INVALID_FIELD_CLASSNAME,
     is = _require$$.is,
     object = _require$$.object,
     generateEffectName = _require$$.generateEffectName,
@@ -1291,7 +1294,7 @@ function requireSmartField() {
     var validationPassed = validators.reduce(function (passed, fn) {
       return passed && fn(value, rule, passed, extras);
     }, true);
-    effects.forEach(function (_ref) {
+    effects.forEach(function invokeValidationResultEffect(_ref) {
       var valid = _ref.valid,
         invalid = _ref.invalid;
       if (validationPassed) {
@@ -1326,6 +1329,27 @@ function requireSmartField() {
     input.addEventListener(targetEvent, function () {
       return _this.validate(_, callback);
     }); // eslint-disable-line
+  };
+
+  SmartField.prototype.reset = function reset() {
+    var element = this.getElement();
+    var _this$getEffects2 = this.getEffects(),
+      defaultEffects = _this$getEffects2["default"],
+      addonEffects = _this$getEffects2.addon;
+    var effects = Array.from(defaultEffects.values()).concat(Array.from(addonEffects.values()));
+    element.classList.remove(APP_CLASSNAME);
+    element.classList.remove(DISABLED_FIELD_CLASSNAME);
+    element.classList.remove(SMART_FIELD_CLASSNAME);
+    element.classList.remove(VALID_FIELD_CLASSNAME);
+    element.classList.remove(INVALID_FIELD_CLASSNAME);
+    claimField(element);
+    if (effects.length > 0) {
+      effects.forEach(function reInitEffect(effect) {
+        if (is["function"](effect.init)) {
+          effect.init(element);
+        }
+      });
+    }
   };
 
   // Helpers
@@ -1418,7 +1442,7 @@ function requireSmartForm() {
     addInstanceMethod = _require$$2.addInstanceMethod,
     addStaticMethod = _require$$2.addStaticMethod;
   var staticMethods = ["getEffects", "useEffect"];
-  var instanceMethods = ["addRule", "removeRule", "getField", "getFields", "getEffects", "useEffect", "toJSON", "validate", "watch"];
+  var instanceMethods = ["addRule", "removeRule", "getField", "getFields", "getEffects", "reset", "useEffect", "toJSON", "validate", "watch"];
   smartForm = SmartForm;
 
   /**
@@ -1501,7 +1525,7 @@ function requireSmartFormValidator() {
     addStaticMethod = _require$$.addStaticMethod;
   var SmartForm = requireSmartForm();
   var staticMethods = ["getEffects", "useEffect"];
-  var instanceMethods = ["addField", "addFields", "addRule", "removeRule", "addValidator", "getValidators", "getField", "getFields", "getEffects", "useEffect", "toJSON", "validate", "watch"];
+  var instanceMethods = ["addField", "addFields", "addRule", "removeRule", "addValidator", "getValidators", "getField", "getFields", "getEffects", "reset", "useEffect", "toJSON", "validate", "watch"];
   smartFormValidator = SmartFormValidator;
   function SmartFormValidator() {
     this.fields = [];
