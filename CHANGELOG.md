@@ -1,3 +1,8 @@
+### 0.3.0-alpha (2023-12-24)
+
+##### New Features
+*  Add `reset` feature ([8cb31c6b](https://github.com/simplymichael/smart-form-validator/commit/8cb31c6bed18203b40906fbedb3af701f628e748))
+
 ### 0.2.1-alpha (2023-12-17)
 
 #### Documentation Changes
