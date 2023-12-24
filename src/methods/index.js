@@ -11,6 +11,7 @@ const instanceMethodNames = [
   "getField",
   "getFields",
   "removeRule",
+  "reset",
   "toJSON",
   "useEffect",
   "validate",

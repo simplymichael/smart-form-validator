@@ -38,7 +38,7 @@ module.exports = function useEffect(effect) {
 
   // Add the effect to the elements attached to the instance.
   if(typeof this.getFields === "function") {
-    this.getFields().forEach(field => {
+    this.getFields().forEach(function registerEffectForField(field) {
       if(!(field.usesEffect(effect.name, effect.meta?.namespace))) {
         field.useEffect(effect);
       }

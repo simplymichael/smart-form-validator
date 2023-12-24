@@ -92,6 +92,7 @@ function index(it, expect) {
       "getField",
       "getFields",
       "removeRule",
+      "reset",
       "toJSON",
       "useEffect",
       "validate",

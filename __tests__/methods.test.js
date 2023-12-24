@@ -29,6 +29,7 @@ module.exports = function methodsTest() {
         useEffect: require("../src/methods/useEffect"),
         validate: require("../src/methods/validate"),
         watch: require("../src/methods/watch"),
+        reset: require("../src/methods/reset"),
       });
 
       this.currentTest.context = context;

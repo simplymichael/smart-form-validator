@@ -7,7 +7,7 @@ const { addInstanceMethod, addStaticMethod } = require("./methods");
 const staticMethods = ["getEffects", "useEffect"];
 const instanceMethods = [
   "addRule", "removeRule", "getField", "getFields", 
-  "getEffects", "useEffect", "toJSON", "validate", "watch"
+  "getEffects", "reset", "useEffect", "toJSON", "validate", "watch"
 ];
 
 

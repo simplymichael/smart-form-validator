@@ -4,7 +4,10 @@ const effects = require("./effects");
 const errorMessages = require("./error-messages");
 const { 
   APP_CLASSNAME,  
+  DISABLED_FIELD_CLASSNAME,
   SMART_FIELD_CLASSNAME,
+  VALID_FIELD_CLASSNAME,
+  INVALID_FIELD_CLASSNAME,
   is,
   object,
   generateEffectName,
@@ -415,7 +418,7 @@ SmartField.prototype.validate = function validate() {
 
   const validationPassed = validators.reduce((passed, fn) => passed && fn(value, rule, passed, extras), true);
 
-  effects.forEach(({ valid, invalid }) => {
+  effects.forEach(function invokeValidationResultEffect({ valid, invalid }) {
     if(validationPassed) {
       valid(input);
     } else {
@@ -444,6 +447,28 @@ SmartField.prototype.watch = function watch(callback) {
   }
   
   input.addEventListener(targetEvent, () => this.validate(_, callback)); // eslint-disable-line
+};
+
+SmartField.prototype.reset = function reset() {
+  const element = this.getElement();
+  const { default: defaultEffects, addon: addonEffects } = this.getEffects();
+  const effects = Array.from(defaultEffects.values()).concat(Array.from(addonEffects.values()));
+
+  element.classList.remove(APP_CLASSNAME);
+  element.classList.remove(DISABLED_FIELD_CLASSNAME);
+  element.classList.remove(SMART_FIELD_CLASSNAME);
+  element.classList.remove(VALID_FIELD_CLASSNAME);
+  element.classList.remove(INVALID_FIELD_CLASSNAME);
+
+  claimField(element);
+
+  if(effects.length > 0) {
+    effects.forEach(function reInitEffect(effect) {
+      if(is.function(effect.init)) {
+        effect.init(element);
+      }
+    });
+  }
 };
 
 

@@ -61,7 +61,8 @@ function wrapWithDOMFunctionality(obj) {
     removeAttribute: (key) => delete this[key],
     classList: {
       add: (className) => newObj.classes.push(className),
-      remove: (className) => newObj.classes = newObj.classes.filter(c => c !== className)
+      remove: (className) => newObj.classes = newObj.classes.filter(c => c !== className),
+      contains: (className) => newObj.classes.includes(className),
     },
   };
 
